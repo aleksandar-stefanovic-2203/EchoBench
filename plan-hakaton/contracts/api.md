@@ -1,6 +1,6 @@
 # REST API ugovor — nacrt
 
-**Base:** `/api`; JSON. Ove rute su planirane, trenutno nisu implementirane.
+**Base:** `/api`; JSON. Rute prve faze implementirane su u `backend/src/`; rezultati provera su u [verification.md](../verification.md).
 
 Privatne rute zahtevaju `Authorization: Bearer <sessionToken>`. Session token daje backend posle registracije ili prijave. Backend iz sesije određuje vlasnika; ne veruje `ownerId` iz zahteva.
 

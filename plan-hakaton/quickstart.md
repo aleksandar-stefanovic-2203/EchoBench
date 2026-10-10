@@ -1,15 +1,15 @@
-# Plan pokretanja i provere
+# Pokretanje i provera
 
-**Status:** vodič za buduću implementaciju. Frontend, backend, package.json i komande ispod još nisu napravljeni. Trenutno se pregledaju dokumenti iz [README-a](README.md).
+**Status:** frontend, backend i komande su napravljeni. Izvršne rezultate proverite u [verification.md](verification.md).
 
 ## Predviđeni preduslovi
 
-- Node.js 24 LTS i npm.
+- Node.js 24 LTS i npm; lokalna implementacija proverava se na kompatibilnom Node 22.20.
 - Dva terminala u korenu repozitorijuma.
 - Za prvu fazu nisu potrebni baza, AI ključ niti Kaggle nalog.
-- Zaključane zavisnosti i npm skripte dodaju se tokom implementacije.
+- Zaključane zavisnosti su u tri package-lock.json fajla. E2E koristi instalirani Microsoft Edge.
 
-## Predložene komande posle implementacije
+## Komande
 
 Backend terminal:
 
@@ -63,7 +63,7 @@ Za drugi uređaj treba podesiti dostupnu frontend adresu i mrežni pristup za de
 | Kontakti | Mejl/lozinka se ne pojavljuju u javnom sadržaju ili odgovoru za listu predaja |
 | E2E | Organizator napravi anketu → gost preda → vlasnik pročita |
 
-Predlog: backend `npm test`, frontend `npm test -- --watch=false`, i root `npm run test:e2e`. Tačne skripte nastaju pri implementaciji; ne tvrdi se da trenutno rade.
+Provere: backend `npm test`, root `npm run build` (backend TypeScript i Angular production build), i root `npm run test:e2e`. Za root Playwright zavisnosti prvo pokrenuti `npm ci` u korenu. Frontend tokovi se proveravaju glavnim Playwright scenarijem; nema posebne frontend unit-test skripte. E2E automatski pokreće servere ako nisu dostupni. Backend koristi `.npmrc` za npm 10 problem sa opcionim Vitest browser peer zavisnostima.
 
 ## Ručna provera UI-ja
 

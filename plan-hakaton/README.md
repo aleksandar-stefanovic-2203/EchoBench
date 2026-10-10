@@ -1,6 +1,6 @@
-# Gemify — nacrt za pregled
+# Gemify — prva implementaciona faza
 
-**Status:** predlog, čeka dogovor tima. **Datum:** 10. oktobar 2026.
+**Status:** posle pregleda plana korisnik je zatražio implementaciju 10. oktobra 2026. Izvori su u `frontend/` i `backend/`; [tasks.md](tasks.md) prati napredak, a [verification.md](verification.md) beleži provere.
 
 ## Šta pravimo
 
@@ -31,7 +31,7 @@ Prva implementaciona faza obuhvata Angular frontend, Node backend i podatke samo
 
 ## Tri predloga za dogovor
 
-Ostatak dokumentacije koristi sledeće radne pretpostavke. Možete ih promeniti pre implementacije.
+Implementacija prati sledeće predložene odluke, na osnovu korisnikovog naloga posle pregleda plana.
 
 | Odluka | Predlog | Alternativa |
 | --- | --- | --- |
@@ -61,6 +61,6 @@ Slike iz `tema-slike` zahtevaju **Gemmu kao ključnu komponentu** i **Kaggle kao
 
 Aktivni feature folder je `plan-hakaton`; putanja je lokalno upisana u `.specify/feature.json`. Spec Kit taj fajl namerno ne deli preko Gita. Posle novog kloniranja, pre pokretanja naredne Spec Kit veštine, u PowerShell-u postavite `$env:SPECIFY_FEATURE_DIRECTORY = 'plan-hakaton'`. Dokumenti nisu duplirani u `specs/`. Grana za specifikaciju je `001-event-feedback`.
 
-Sada pregledamo nacrt i dogovaramo odluke iznad. Zatim ažuriramo dokumente, po potrebi definišemo projektna pravila kroz `$speckit-constitution`, pa pokrećemo `$speckit-tasks` i `$speckit-analyze`. Implementaciju započinjemo tek kada tim odobri plan. `tasks.md` će nastati u toj sledećoj fazi.
+Korisnik je posle pregleda odobrio početak implementacije. Generisan je [tasks.md](tasks.md) sa 20 zadataka, organizovanih po pet korisničkih priča. Provere i ograničenja se beleže u [verification.md](verification.md).
 
-Ovo je namerno nacrt: postojeći constitution fajl je još nepopunjen Spec Kit šablon. Prihvatanje pretpostavki nije simulirano, a nijedna opisana funkcionalnost aplikacije još nije implementirana.
+Constitution fajl je još nepopunjen Spec Kit šablon i njegovi primeri nisu usvojena pravila. Reviewer-owned kontrolna lista ostaje neizmenjena kao zapis ranijeg pregleda. Gemma i Kaggle ostaju posebna naredna faza.

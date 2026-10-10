@@ -1,6 +1,6 @@
-# Model podataka — predlog
+# Model podataka — prva faza
 
-**Status:** nacrt. Svi podaci su u RAM-u jednog Node procesa. Nema baze, JSON fajla za čuvanje, browser baze ni lokalnog čuvanja poslovnih podataka.
+**Status:** primenjen u `backend/src/types/index.ts` i `backend/src/store/index.ts`. Svi podaci su u RAM-u jednog Node procesa. Nema baze, JSON fajla za čuvanje, browser baze ni lokalnog čuvanja poslovnih podataka.
 
 ## Entiteti
 

@@ -1,0 +1,56 @@
+@use 'sass:color';
+:root { font-family: 'Segoe UI', system-ui, sans-serif; color: #203b32; background: #f5f7f2; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #21644e; text-underline-offset: 3px; }
+button, input, textarea, select { font: inherit; }
+button, .button { cursor: pointer; border: 1px solid #28694f; background: #28694f; color: white; border-radius: 10px; padding: 11px 18px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; }
+button.secondary, .button.secondary { background: white; color: #28694f; border-color: #cfdbd2; }
+button.danger { background: transparent; color: #a43535; border-color: #e7cccc; }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 3px solid #ae722e; outline-offset: 3px; }
+input:not([type='checkbox']), textarea, select { width: 100%; min-width: 0; border: 1px solid #bacbc0; border-radius: 8px; background: white; color: #203b32; padding: 12px; }
+textarea { resize: vertical; min-height: 110px; }
+input[type='checkbox'] { width: 20px; height: 20px; accent-color: #28694f; flex-shrink: 0; }
+label { display: block; font-weight: 600; margin-bottom: 7px; }
+.field { margin-bottom: 20px; }
+.check { display: flex; gap: 10px; align-items: center; font-weight: 400; min-height: 44px; }
+.field-error { color: #a43535; font-size: .9rem; margin: 7px 0; }
+[aria-invalid='true'] { border-color: #a43535 !important; }
+.shell { max-width: 1080px; margin: auto; padding: 32px 24px 64px; }
+.narrow { max-width: 680px; margin: auto; }
+.auth-layout { max-width: 900px; margin: 28px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.eyebrow { font-size: .8rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: #607a60; margin-bottom: 12px; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -.045em; line-height: 1.12; margin: 0 0 18px; overflow-wrap: anywhere; }
+h2 { font-size: 1.3rem; margin: 0 0 16px; }
+h3 { margin-top: 0; }
+p { line-height: 1.6; }
+.muted, small { color: #65796e; }
+.card { padding: 28px; background: white; border: 1px solid #dce5da; border-radius: 16px; margin-bottom: 20px; min-width: 0; }
+.card p:last-child { margin-bottom: 0; }
+.heading { display: flex; gap: 20px; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+.heading h1 { margin-bottom: 8px; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.notice { padding: 16px 20px; border-radius: 10px; border: 1px solid #ccdbc9; background: #edf5e9; margin-bottom: 20px; }
+.notice.error { border-color: #e9c5c5; background: #fff3f3; color: #8b3030; }
+.notice p { margin: 5px 0; }
+.badge { display: inline-flex; font-size: .8rem; padding: 5px 10px; border-radius: 20px; background: #edf2e9; color: #49653f; }
+.survey-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.survey-grid .card { display: flex; flex-direction: column; margin: 0; }
+.survey-grid h2 { margin-top: 18px; overflow-wrap: anywhere; }
+.survey-grid .actions { margin-top: auto; padding-top: 16px; }
+.empty { padding: 48px 24px; text-align: center; }
+.question { border: 1px solid #dce5da; border-radius: 12px; padding: 22px; margin-bottom: 20px; }
+.question-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.question-head h2 { margin: 0; }
+.option-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
+.share-link { margin: 14px 0; }
+.answer { white-space: pre-wrap; overflow-wrap: anywhere; }
+details { margin-bottom: 16px; }
+summary { cursor: pointer; min-height: 44px; font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+summary::before { content: '+'; font-size: 1.3rem; font-weight: 400; color: #28694f; }
+details[open] > summary::before { content: '−'; }
+.question-status { margin-left: 8px; }
+.required { color: #a43535; }
+.success-mark { width: 64px; height: 64px; border-radius: 50%; background: #edf5e9; display: grid; place-items: center; font-size: 2rem; color: #28694f; margin: 0 auto 24px; }
+@media (max-width: 650px) { .shell { padding: 24px 16px 48px; } .auth-layout { display: block; margin: 0; } .auth-intro { margin-bottom: 28px; } .card { padding: 20px; } .heading { align-items: flex-start; flex-direction: column; } .question { padding: 16px; } .question-head { flex-wrap: wrap; } .option-row { gap: 7px; } .option-row button { padding: 10px; } }

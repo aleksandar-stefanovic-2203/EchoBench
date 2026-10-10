@@ -2,7 +2,7 @@
 
 **Branch:** `001-event-feedback` | **Date:** 2026-10-10 | **Spec:** [spec.md](spec.md)
 **Input:** `plan-hakaton/spec.md`
-**Status:** tehnički nacrt za odobrenje, nije nalog za implementaciju.
+**Status:** korisnik je posle pregleda plana 2026-10-10 zatražio implementaciju prve faze. Napredak je u tasks.md, a rezultati u verification.md.
 
 ## Summary
 
@@ -40,7 +40,7 @@ Provere prema korisničkom zahtevu, pre i posle projektovanja:
 - Organizator vidi sopstvene ankete i odgovore: ispunjeno.
 - AI poziv odložen: ispunjeno; samo UI mesto za buduću funkciju.
 - Dokumentacija pre implementacije: ispunjeno.
-- Odobrenje tima i tri radne odluke: još otvoreno.
+- Korisnik je odobrio početak prema ovom planu i tri predložene produktne odluke; constitution šablon nije usvojen kao pravilo.
 
 ## Arhitektura
 
@@ -90,7 +90,7 @@ plan-hakaton/
 └── checklists/requirements.md
 ```
 
-`tasks.md` se generiše tek posle odobrenja.
+`tasks.md` je generisan posle korisnikovog naloga za početak implementacije.
 
 ### Source Code — predlog buduće strukture
 
@@ -118,7 +118,7 @@ e2e/
 plan-hakaton/
 ```
 
-Svaki deo ima svoj `package.json`; bez dodatnog monorepo alata. Budući `backend/src/summaries/` dodajemo tek u AI fazi. Trenutno nijedan navedeni izvorni folder nije implementiran.
+Svaki deo ima svoj `package.json`; root package sadrži Playwright i agregatne skripte. Budući `backend/src/summaries/` dodajemo tek u AI fazi. Frontend/backend izvori su u navedenim folderima.
 
 ## Redosled implementacije posle odobrenja
 

@@ -1,6 +1,6 @@
 # Odluke i istraživanje za nacrt
 
-**Datum provere:** 2026-10-10. Odluke su predlog za tim, ne implementirani rezultat.
+**Datum provere:** 2026-10-10. Dokument čuva obrazloženje prvobitnog predloga. Korisnik je posle pregleda zatražio implementaciju prve faze prema ovim odlukama; izvršni rezultati su u verification.md.
 
 ## 1. Tema i obavezni delovi hakatona
 
@@ -83,4 +83,4 @@ Za isti sintetički skup uporediti vreme ručnog pregleda i vreme do pregledanog
 
 ## Šta ostaje otvoreno
 
-Tri produktne odluke u README-u rešavamo pre implementacije prve faze. Izbor modela, inference provajdera, pristupa i formata dokazivanja Kaggle rada rešava se pre AI faze i ne blokira izradu ovog nacrta.
+Tri produktne odluke u README-u primenjene su nakon korisnikovog naloga za početak implementacije. Izbor modela, inference provajdera, pristupa i formata dokazivanja Kaggle rada rešava se pre AI faze i ne blokira prototip anketa.

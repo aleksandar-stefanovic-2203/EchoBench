@@ -2,7 +2,7 @@
 
 **Feature Branch:** `001-event-feedback`
 **Created:** 2026-10-10
-**Status:** nacrt za pregled; pretpostavke čekaju dogovor.
+**Status:** prva faza odobrena za implementaciju 2026-10-10; rezultate provera pratiti u verification.md.
 **Input:** Organizator pravi feedback anketu, deli link i pregleda odgovore. Učesnik unosi mejl i odgovore bez prijave. AI obrada dolazi naknadno; sada postoji samo dugme „Sumiraj”.
 
 ## User Scenarios & Testing
@@ -139,7 +139,7 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 
 ## Assumptions
 
-- Tri odluke iz README-a su radne pretpostavke do pregleda tima.
+- Posle pregleda plana korisnik je 2026-10-10 zatražio implementaciju: mejl je skriven organizatoru, namerna ponovna predaja istim mejlom je dozvoljena, a objavljena pitanja su zaključana.
 - Interfejs je na srpskom, latinicom; sadržaj anketa može biti na drugim jezicima.
 - Checkbox znači više mogućih izbora; tekstualno pitanje koristi višeredni unos.
 - Mejl se sintaksno proverava, ali se vlasništvo nad adresom ne potvrđuje.
