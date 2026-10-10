@@ -2,7 +2,7 @@
 
 Feedback za događaje: organizator pravi anketu, deli link i pregleda odgovore; učesnici popunjavaju bez naloga. Interfejs je na srpskom, latinicom.
 
-Angular 21 frontend + Express 5/TypeScript backend. Podaci postoje samo u RAM-u jednog servera. Restart briše naloge, sesije, ankete, kontakte i predaje. Dugme **Sumiraj** prikazuje obaveštenje; Gemma/Kaggle integracija je naredna faza.
+Angular 21 frontend + Express 5/TypeScript backend. Podaci postoje samo u RAM-u jednog servera. Restart briše naloge, sesije, ankete, kontakte i predaje. Dugme **Sumiraj** poziva Gemmu preko Gemini API-ja i obrađuje sve predaje iz izabrane ankete. Kaggle notebook i procena korisnosti ostaju naredni deo hakatonskog rada.
 
 ## Pokretanje
 
@@ -11,6 +11,8 @@ Node 24 LTS preporučen; kompatibilan je i Node 22.12+. Potrebni su npm i dva te
 ```powershell
 cd backend
 npm ci
+Copy-Item .env.example .env
+# Unesite svoj ključ u GEMINI_API_KEY u .env pre pokretanja.
 npm run dev
 ```
 
@@ -24,12 +26,16 @@ npm start
 
 Otvorite **http://localhost:4200**. API health: http://localhost:3000/api/health. Angular proxy šalje `/api` zahteve backendu na portu 3000.
 
-Backend čita `PORT` i `PUBLIC_APP_URL` iz okruženja, sa podrazumevanim vrednostima 3000 i `http://localhost:4200`. `.env.example` je primer, ne učitava se automatski. Za drugi uređaj postavite dostupnu LAN adresu pre pokretanja backenda:
+Backend automatski učitava `backend/.env`; postojeće promenljive okruženja imaju prednost. `PORT` i `PUBLIC_APP_URL` podrazumevano su 3000 i `http://localhost:4200`. Za drugi uređaj postavite dostupnu LAN adresu pre pokretanja backenda:
 
 ```powershell
 $env:PUBLIC_APP_URL = 'http://192.168.1.10:4200'
 npm run dev
 ```
+
+Za AI unesite Google AI Studio ključ u `GEMINI_API_KEY`; ključ ostaje u ignorisanom `backend/.env` i nikada se ne šalje browseru. `GEMMA_MODEL=gemma-4-26b-a4b-it` bira Gemma model, a `SUMMARY_TIMEOUT_MS=120000` ukupni rok za sažimanje. Restartujte backend posle izmene konfiguracije. Google dokumentuje Gemma pristup preko [Gemini API-ja](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
+
+Sažetak koristi snapshot svih odgovora iz jedne ankete, pretvara checkbox ID-jeve u nazive i ne šalje kontaktne mejlove niti podatke za prijavu. Veći ulaz obrađuje u grupama i spaja nalaze. Prikazuje broj obrađenih predaja, vreme i model; osvežavanje odgovora označava zastareo sažetak. Bez ključa ostatak aplikacije radi, a „Sumiraj” prikazuje jasnu grešku. Sažetak ostaje samo u otvorenom prikazu i ne čuva se na disku. Slobodni tekst pitanja/odgovora može sadržati lične podatke koje je autor sam uneo; izdvojeni kontakt ne ulazi u AI payload.
 
 ## Provere
 

@@ -8,7 +8,7 @@
 
 Angular SPA za dva korisnička toka, Node/Express REST API i memorijske strukture u jednom procesu. Backend je jedini izvor podataka o organizatorima, sesijama, anketama i predajama. Javna forma ne zahteva nalog. Organizatorske rute proveravaju sesiju i vlasništvo.
 
-U prvoj fazi „Sumiraj” poziva samo frontend handler koji prikazuje obaveštenje. Backend interfejs za Gemmu i buduća ruta dokumentovani su u ugovoru, ali se sada ne implementiraju.
+Prva faza je završena sa placeholder dugmetom. Korisnik je 2026-10-10 odobrio drugu fazu: „Sumiraj” poziva backend i Gemmu preko Gemini API-ja za sve predaje iz izabrane ankete. API ključ je u backend/.env.
 
 ## Technical Context
 
@@ -38,7 +38,7 @@ Provere prema korisničkom zahtevu, pre i posle projektovanja:
 - Podaci samo u backend memoriji: ispunjeno; bez baze i disk persistencije.
 - Učesnik nema nalog; mejl se prikuplja: ispunjeno uz vidljivo pitanje anonimnosti.
 - Organizator vidi sopstvene ankete i odgovore: ispunjeno.
-- AI poziv odložen: ispunjeno; samo UI mesto za buduću funkciju.
+- AI poziv prvobitno odložen; u drugoj fazi odobren backend Gemma poziv bez promene ostalih pravila.
 - Dokumentacija pre implementacije: ispunjeno.
 - Korisnik je odobrio početak prema ovom planu i tri predložene produktne odluke; constitution šablon nije usvojen kao pravilo.
 
@@ -50,7 +50,7 @@ flowchart LR
     U[Učesnik preko javnog linka] --> A
     A -->|REST JSON /api| B[Node + Express]
     B --> M[Organizatori, sesije, ankete, predaje u memoriji]
-    B -. kasnija faza .-> G[Gemma provider]
+    B --> G[Gemma provider preko Gemini API-ja]
 ```
 
 Backend slojevi: ruta → validacija i autentifikacija → servis → memorijski store. Mali servisni moduli odvajaju pravila od Express handlera. Nema generičkog repository frameworka, redova poslova, WebSocket-a ni mikroservisa.
@@ -118,7 +118,7 @@ e2e/
 plan-hakaton/
 ```
 
-Svaki deo ima svoj `package.json`; root package sadrži Playwright i agregatne skripte. Budući `backend/src/summaries/` dodajemo tek u AI fazi. Frontend/backend izvori su u navedenim folderima.
+Svaki deo ima svoj `package.json`; root package sadrži Playwright i agregatne skripte. `backend/src/summaries/` sadrži provider, validaciju izlaza i vlasničku rutu druge faze. Frontend/backend izvori su u navedenim folderima.
 
 ## Redosled implementacije posle odobrenja
 
@@ -133,12 +133,14 @@ Svaki deo ima svoj `package.json`; root package sadrži Playwright i agregatne s
 
 Provera vlasništva i validacija ulaza dolaze sa pripadajućim rutama, a ne na kraju. Registrovanje i predaja ažuriraju sve povezane memorijske strukture zajedno, bez `await` između provere i upisa, da paralelni zahtevi ne zaobiđu jedinstvenost ili deduplikaciju.
 
-## Buduća AI faza
+## AI faza — odobren nastavak
 
-Nakon završetka prvog prototipa tim bira konkretnu Gemma varijantu, način hostovanja i pristup inference servisu. Backend će za jednu svoju anketu sam učitati sve predaje i napraviti snapshot, ukloniti kontaktne podatke i proslediti ih `SummaryProvider` interfejsu.
+Izabrani provider je Google Gemini API sa Gemma modelom `gemma-4-26b-a4b-it`, konfigurabilnim kroz `GEMMA_MODEL`. Backend sam učitava sve predaje jedne vlasničke ankete, pravi snapshot dozvoljenih polja i prosleđuje ga `SummaryProvider` interfejsu. Gemini API ključ pristupa Gemmi; nije dozvoljena tiha zamena Gemini modelom. Ključ ostaje na serveru. `server.ts` automatski učitava backend/.env.
+
+Provider deli odgovore po pitanjima u grupe do 24.000 znakova i spaja parcijalne sažetke, sa ukupnim rokom 120 sekundi. Validira JSON i vraća jasne greške; ne vraća delimičan rezultat kao kompletan. Jedan aktivan summary zahtev po anketi sprečava paralelne duple klikove. UI prikazuje rezultat, model, vreme i broj predaja; nakon osvežavanja označava zastarelost. Rezultat se ne čuva trajno.
 
 Kaggle notebook treba da pokaže rad sa izabranim Gemma modelom nad sintetičkim feedbackom i dokumentuje nalaze. Ne pretpostavljamo da notebook već predstavlja stabilan API server. Velike skupove odgovora kasnije treba obrađivati u grupama bez tihog odbacivanja predaja. Ugovor i očekivani izlaz su u [contracts/api.md](contracts/api.md).
 
 ## Complexity Tracking
 
-Najveća ograničenja su namerna: jedan proces, gubitak podataka pri restartu, prototipske lozinke, bez korisničkog identiteta učesnika i bez AI-ja u prvoj fazi. Osim radnih odluka u README-u, dodatna infrastruktura nije potrebna za ovaj obim.
+Najveća ograničenja su namerna: jedan proces, gubitak podataka pri restartu i prototipske lozinke. AI druga faza zavisi od korisnikovog ključa, pristupa modelu i API kvote. Kaggle dokaz rada ostaje za završni demo. Nema dodatne infrastrukture za ovaj obim.

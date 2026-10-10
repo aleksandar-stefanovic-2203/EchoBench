@@ -6,7 +6,7 @@
 
 Web aplikaciju za prikupljanje feedbacka posle događaja. Organizator pravi anketu, deli link i pregleda odgovore. Učesnik preko linka unosi mejl i odgovore, bez naloga i prijave. Prvi primer je hakaton, ali nazivi i model podržavaju i druge događaje.
 
-Prva implementaciona faza obuhvata Angular frontend, Node backend i podatke samo u memoriji backenda. Dugme **„Sumiraj”** postoji i objašnjava da AI sažetak još nije dostupan. Pravi poziv Gemmi dolazi u posebnoj, kasnije dogovorenoj fazi.
+Prva implementaciona faza obuhvata Angular frontend, Node backend i podatke samo u memoriji backenda. Korisnik je 2026-10-10 odobrio nastavak: dugme **„Sumiraj”** poziva Gemmu preko Gemini API-ja i sažima sve predaje iz izabrane ankete. Konfiguracija je u backend/.env.example; za stvaran poziv treba uneti ključ u backend/.env.
 
 ## Tok korišćenja
 
@@ -26,7 +26,7 @@ Prva implementaciona faza obuhvata Angular frontend, Node backend i podatke samo
 | Tekstualna i checkbox pitanja; obavezno/neobavezno | Radio izbor, ocene, upload fajlova, grananje pitanja |
 | Objavljivanje i kopiranje javnog linka | Slanje mejlova i pozivnica iz aplikacije |
 | Predaja i pregled odgovora | Izvoz i napredna analitika |
-| Dugme „Sumiraj” sa porukom da funkcija dolazi kasnije | Gemma poziv, prompt i generisanje sažetka |
+| Gemma sažetak svih predaja iz izabrane ankete | Kaggle notebook i procena korisnosti na označenom skupu |
 | Memorija jednog backend procesa | Baza, upis podataka u fajlove i oporavak posle restarta |
 
 ## Tri predloga za dogovor
@@ -43,7 +43,7 @@ Implementacija prati sledeće predložene odluke, na osnovu korisnikovog naloga 
 
 ## Veza sa temom hakatona
 
-Slike iz `tema-slike` zahtevaju **Gemmu kao ključnu komponentu** i **Kaggle kao deo razvoja**. Koncept odgovara oblasti „Feedback & Continuous Improvement”. Prva faza priprema prikupljanje podataka; kompletan hakatonski demo zahteva kasniju Gemma integraciju i dokaz rada u Kaggle-u. Detalji su u [research.md](research.md).
+Slike iz `tema-slike` zahtevaju **Gemmu kao ključnu komponentu** i **Kaggle kao deo razvoja**. Koncept odgovara oblasti „Feedback & Continuous Improvement”. Gemma integracija je implementirana u nastavku; stvarna provera sa ključem, procena korisnosti i dokaz rada u Kaggle-u još su potrebni za završni demo. Detalji su u [research.md](research.md).
 
 ## Dokumenti
 

@@ -2,8 +2,8 @@
 
 **Feature Branch:** `001-event-feedback`
 **Created:** 2026-10-10
-**Status:** prva faza odobrena za implementaciju 2026-10-10; rezultate provera pratiti u verification.md.
-**Input:** Organizator pravi feedback anketu, deli link i pregleda odgovore. Učesnik unosi mejl i odgovore bez prijave. AI obrada dolazi naknadno; sada postoji samo dugme „Sumiraj”.
+**Status:** prva faza i nastavak AI implementacije odobreni 2026-10-10; rezultate provera pratiti u verification.md.
+**Input:** Organizator pravi feedback anketu, deli link i pregleda odgovore. Učesnik unosi mejl i odgovore bez prijave. Nastavak: „Sumiraj” koristi Gemmu preko API-ja za sve predaje iz izabrane ankete, kako je korisnik potvrdio.
 
 ## User Scenarios & Testing
 
@@ -74,19 +74,22 @@ Organizator sa liste svojih anketa otvara detalje, kopira javni link i čita poj
 4. U predloženom režimu organizator vidi „Odgovor 1”, „Odgovor 2” itd., bez mejlova učesnika.
 5. Osvežavanje detalja učitava novopristigle odgovore; prikaz uživo nije potreban.
 
-### US-05 — Mesto za AI sažetak (Priority: P2)
+### US-05 — Gemma sažetak (Priority: P2)
 
 Organizator u detaljima ankete vidi „Sumiraj”.
 
-**Why this priority:** priprema budući tok bez predstavljanja nepostojećeg rezultata kao stvarnog.
+**Why this priority:** organizator dobija pregled svih predaja i konkretne predloge poboljšanja; Gemma je zahtev hakatona.
 
-**Independent Test:** klik u anketi sa odgovorima prikazuje obaveštenje o budućoj funkcionalnosti.
+**Independent Test:** klik u anketi sa odgovorima poziva vlasnički endpoint i prikazuje validiran sažetak; greške se prikazuju bez lažnog uspeha.
 
 **Acceptance Scenarios:**
 
 1. Bez odgovora dugme je onemogućeno uz objašnjenje.
-2. Sa najmanje jednim odgovorom klik prikazuje „AI sažimanje još nije povezano”.
-3. Klik u prvoj fazi ne šalje podatke AI servisu i ne prikazuje izmišljeni sažetak.
+2. Sa najmanje jednim odgovorom klik poziva backend; tokom obrade dugme je onemogućeno.
+3. Backend uzima sve predaje iz izabrane ankete i šalje Gemmi sadržaj pitanja/odgovora bez kontakata i login podataka. Veći ulaz grupiše i spaja bez tihog odbacivanja predaja.
+4. Prikaz sadrži pregled, teme, pozitivne utiske, poboljšanja, akcije, broj predaja, vreme i model.
+5. Nedostajući ključ, API greška, nevalidan izlaz i timeout daju razumljivu grešku. Ponovni pokušaj je moguć.
+6. Novopristigle predaje nakon osvežavanja označavaju prethodni sažetak kao zastareo.
 
 ### Edge Cases
 
@@ -114,7 +117,7 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 - **FR-009:** Vlasnik vidi broj i sadržaj svake predaje, uključujući sve izabrane opcije.
 - **FR-010:** Sačuvani kontakt se ne prikazuje u pregledima i ne uključuje u kasniji materijal za sažimanje, prema predloženom režimu.
 - **FR-011:** Sprečiti tehničke duplikate istog zahteva; dozvoliti novo namerno popunjavanje.
-- **FR-012:** „Sumiraj” prati US-05, bez AI obrade u prvoj fazi.
+- **FR-012:** „Sumiraj” prati US-05 uz backend Gemma API poziv odobren u drugoj fazi; samo vlasnik može zahtevati sažetak.
 - **FR-013:** Stanja učitavanja, prazne liste, greške i potvrde; na grešci predaje zadržati unos.
 - **FR-014:** Objasniti prikupljanje mejla bez tvrdnje da je feedback potpuno anoniman.
 - **FR-015:** Podaci postoje tokom rada servera; osvežavanje stranice ih ne briše, restart servera ih briše.
@@ -134,7 +137,7 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 - **SC-002:** Tri učesnika bez naloga predaju feedback; organizator vidi tačno tri predaje i sve odgovore.
 - **SC-003:** Negativni scenariji iz US-01/03 sprečavaju nevalidnu predaju ili neovlašćen pristup i daju razumljivu poruku.
 - **SC-004:** Javno popunjavanje na širini 360 px nema horizontalno skrolovanje; polja mogu da se koriste tastaturom.
-- **SC-005:** „Sumiraj” jasno pokazuje da AI još nije dostupan i nema lažnog rezultata.
+- **SC-005:** „Sumiraj” prikazuje validan AI rezultat za sve predaje snapshot-a ili jasnu grešku bez lažnog uspeha.
 - **SC-006:** Na dogovorenom lokalnom demo uređaju, sa 10 anketa i po 200 predaja, lista i detalji se otvaraju za do dve sekunde u normalnim uslovima. Ovo je cilj za proveru, ne izmeren rezultat.
 
 ## Assumptions
@@ -145,4 +148,4 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 - Mejl se sintaksno proverava, ali se vlasništvo nad adresom ne potvrđuje.
 - Jedan organizator poseduje svaku anketu. Nema administrativne uloge, timskih naloga niti posebnog modula za upravljanje događajem.
 - Jedna serverska instanca i privremeni podaci su dovoljan obim prototipa.
-- AI sažimanje i dokaz Kaggle upotrebe su odvojena naredna faza potrebna za kompletan hakatonski demo.
+- AI sažimanje je odobreno u nastavku rada; stvarna API provera zahteva korisnikov ključ. Kaggle notebook i dokaz korisnosti ostaju potrebni za kompletan hakatonski demo.

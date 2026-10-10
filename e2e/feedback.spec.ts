@@ -24,7 +24,19 @@ test('organizer → draft → public mobile form → three responses → owner/p
   await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click(); await expect(guest.getByRole('heading',{name:'Hvala na utiscima!'})).toBeVisible(); expect(sent[1]).toEqual(sent[0]); await guest.unrouteAll();
   for(let i=0;i<2;i++){await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.getByLabel('Vaš mejl').fill('guest@example.com');await guest.getByLabel('1. Šta je bilo najbolje?').fill(`Odgovor ${i+2}`);await guest.getByLabel('Mentori',{exact:true}).check();await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click();await expect(guest.getByRole('heading',{name:'Hvala na utiscima!'})).toBeVisible();}
   await page.getByRole('button',{name:'Osveži odgovore'}).click(); await expect(page.getByRole('heading',{name:'Odgovori · 3',exact:true})).toBeVisible(); await page.locator('summary').last().click(); await expect(page.getByText('Mentori, Radionice',{exact:true})).toBeVisible(); await expect(page.getByText('guest@example.com')).not.toBeVisible();
-  const aiRequests:string[]=[];page.on('request',req=>{if(/summary|gemma/i.test(req.url())) aiRequests.push(req.url());});await page.getByRole('button',{name:'Sumiraj',exact:true}).click();await expect(page.getByText('AI sažimanje još nije povezano',{exact:true})).toBeVisible();expect(aiRequests).toEqual([]);
+  let summaryCalls=0;
+  await page.route('**/api/surveys/*/summary',async route=>{
+    summaryCalls++;
+    expect(route.request().method()).toBe('POST'); expect(route.request().postDataJSON()).toEqual({});
+    if(summaryCalls===1) {await route.fulfill({status:503,json:{error:{code:'SUMMARY_UNAVAILABLE',message:'Gemma API nije dostupan. Pokušajte ponovo.'}}});return;}
+    await new Promise(resolve=>setTimeout(resolve,250));
+    await route.fulfill({json:{summary:{surveyId:privateUrl.split('/').at(-1),responseCount:3,generatedAt:new Date().toISOString(),model:'gemma-test',overview:'Učesnici hvale mentore.',themes:['Mentorstvo'],positiveHighlights:['Odlični mentori'],improvements:[],suggestedActions:['Nastaviti mentorstvo']}}});
+  });
+  await page.getByRole('button',{name:'Sumiraj',exact:true}).click();await expect(page.getByRole('alert')).toContainText('Gemma API nije dostupan');
+  await page.getByRole('button',{name:'Sumiraj',exact:true}).click();await expect(page.getByRole('button',{name:'Sažimanje…',exact:true})).toBeDisabled();
+  await expect(page.getByRole('heading',{name:'AI sažetak',exact:true})).toBeVisible();await expect(page.getByText('Učesnici hvale mentore.',{exact:true})).toBeVisible();expect(summaryCalls).toBe(2);
+  await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.getByLabel('Vaš mejl').fill('guest@example.com');await guest.getByLabel('1. Šta je bilo najbolje?').fill('Novi utisak');await guest.getByLabel('Mentori',{exact:true}).check();await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click();
+  await page.getByRole('button',{name:'Osveži odgovore'}).click();await expect(page.getByText('Stigli su novi odgovori. Kliknite „Sumiraj” za ažuriran sažetak.')).toBeVisible();
   await page.screenshot({path:'test-results/organizer-detail.png',fullPage:true});
   await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.screenshot({path:'test-results/public-mobile.png',fullPage:true});
   const other=await browser.newContext();const b=await other.newPage();await register(b,crypto.randomUUID());await b.goto(privateUrl);await expect(b.getByRole('alert')).toContainText('Anketa nije dostupna');

@@ -78,6 +78,6 @@ Backend prvo proverava ceo zahtev, pa zajedno upisuje Submission, SubmissionCont
 
 Ako već postoji isti `surveyId + clientRequestId` i ista normalizovana predaja, vraća se isti rezultat bez dodatnog upisa. Ako je ključ isti, a sadržaj drugačiji, vraća se konflikt. Novo namerno popunjavanje ima novi ključ, čak i kada je mejl isti. Ovo je zaštita od tehničkog ponavljanja zahteva, ne provera identiteta učesnika.
 
-## Budući sažetak
+## Sažetak — druga faza
 
-Prva faza nema Summary kolekciju. Kasnije se može dodati rezultat vezan za anketu, vreme generisanja, broj obrađenih predaja i verziju modela. AI ulaz se sastavlja iz dozvoljenih polja; ne koristi se serijalizacija celog store-a.
+Nema Summary kolekcije. Sažetak se vraća kao `{surveyId, responseCount, generatedAt, model, overview, themes[], positiveHighlights[], improvements[], suggestedActions[]}` i ostaje samo u otvorenom frontend prikazu. AI ulaz se sastavlja iz naslova/opisa i svih predaja, sa tekstom pitanja i nazivima izabranih checkbox opcija. Ne koristi se serijalizacija celog store-a. Snapshot se pravi pre prvog await-a, pa nove predaje ne menjaju skup u tekućoj obradi.

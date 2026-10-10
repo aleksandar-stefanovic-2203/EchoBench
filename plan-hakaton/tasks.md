@@ -58,6 +58,17 @@
 - [X] T019 Izvršiti backend testove, oba build-a i demo obim 10 × 200 u backend/tests/performance.test.ts; rezultate zabeležiti u plan-hakaton/verification.md.
 - [X] T020 Ažurirati stvarne komande i status u README.md, plan-hakaton/README.md, plan-hakaton/quickstart.md, plan-hakaton/spec.md, plan-hakaton/plan.md i plan-hakaton/contracts/api.md.
 
+## Phase 9: Gemma API — odobren nastavak 2026-10-10
+
+- [X] T021 Ažurirati spec/plan/API ugovor za sve predaje iz izabrane ankete i Google Gemini API sa Gemma modelom.
+- [X] T022 Napisati red test za summary API/provider u backend/tests/summaries.test.ts pre implementacije.
+- [X] T023 Implementirati snapshot bez kontakata/login podataka, vlasnički endpoint, Gemma REST adapter, grupisanje/spajanje, validaciju i timeout u backend/src/summaries/index.ts.
+- [X] T024 Proširiti backend/.env.example i automatsko učitavanje backend/.env; ključ ostaje na backendu.
+- [X] T025 Povezati dugme i prikaz strukturiranog rezultata, obradu, greške/retry i zastarelost u frontend detaljima.
+- [X] T026 Izvršiti API/provider testove, build i ažurirani browser tok; rezultate zabeležiti u verification.md.
+
+Stvarni API poziv i Kaggle notebook nisu predstavljeni kao završeni bez korisnikovog ključa i izvršne provere. Prva faza iznad ostaje istorijski zapis; T021–T026 zamenjuju placeholder funkciju.
+
 ## Dependencies & execution order
 
 Setup → Foundation → US1 → US2 → US3 → US4 → US5 → Polish. US4 backend testovi mogu deliti pripremu sa US3; US5 zavisi od US4. Testovi se pišu pre servisa. Backend i frontend deo priče mogu se raditi nezavisno posle usaglašenog ugovora; svaka priča se proverava pre naredne.

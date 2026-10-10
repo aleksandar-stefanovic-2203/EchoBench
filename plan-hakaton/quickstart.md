@@ -6,7 +6,7 @@
 
 - Node.js 24 LTS i npm; lokalna implementacija proverava se na kompatibilnom Node 22.20.
 - Dva terminala u korenu repozitorijuma.
-- Za prvu fazu nisu potrebni baza, AI ključ niti Kaggle nalog.
+- Baza nije potrebna. Sažimanje u drugoj fazi zahteva Google AI Studio / Gemini API ključ sa pristupom Gemma modelu; ostali tokovi rade i bez ključa.
 - Zaključane zavisnosti su u tri package-lock.json fajla. E2E koristi instalirani Microsoft Edge.
 
 ## Komande
@@ -16,6 +16,8 @@ Backend terminal:
 ```powershell
 cd C:\Users\User\Desktop\Gemify\backend
 npm ci
+Copy-Item .env.example .env
+# U .env popuniti GEMINI_API_KEY. Posle izmena restartovati backend.
 npm run dev
 ```
 
@@ -45,7 +47,7 @@ Za drugi uređaj treba podesiti dostupnu frontend adresu i mrežni pristup za de
 6. Pokušati nevalidnu predaju bez mejla i obaveznih odgovora; očekuje se greška i nula sačuvanih predaja.
 7. Poslati validnu predaju sa dve checkbox opcije i praznim opcionim pitanjima; očekuje se potvrda.
 8. Poslati još dve predaje; organizator posle osvežavanja vidi ukupno tri, tačan tekst i nazive opcija, bez kontakata.
-9. Kliknuti „Sumiraj”; očekuje se obaveštenje da AI nije povezan i nijedan AI mrežni poziv.
+9. Kliknuti „Sumiraj”; sa podešenim ključem očekuje se Gemma sažetak svih tri predaja sa pregledom, temama i koracima. Bez ključa očekuje se poruka za konfiguraciju, bez lažnog sažetka. Tokom obrade dugme je disabled. Poslati novu predaju, osvežiti i proveriti oznaku zastarelog sažetka.
 10. Registrovati B u drugom prozoru; njegov dashboard je prazan i direktan pristup privatnim rutama ankete A nije dozvoljen.
 11. Odjaviti A; privatni zahtevi sa njegovim starim tokenom više ne uspevaju.
 12. Restartovati backend; očekuju se prazni store-ovi, nevažeće sesije i nevažeći prethodni javni link.
@@ -69,4 +71,4 @@ Provere: backend `npm test`, root `npm run build` (backend TypeScript i Angular 
 
 Proveriti prikaz na širini 360 px, tab navigaciju, oznake obaveznih polja, povezane labele, prazne liste, greške servera, zadržavanje unosa posle neuspelog slanja i mogućnost ručnog kopiranja prikazanog linka ako clipboard nije dostupan.
 
-AI funkcionalnost se proverava tek u zasebnoj narednoj fazi, prema [research.md](research.md) i [API ugovoru](contracts/api.md).
+AI adapter/API testovi koriste simulirane Google odgovore; browser test simulira summary endpoint da ne troši kvotu. Stvarnu kvalitet/vreme provere izvršiti sa korisnikovim ključem na sintetičkom feedbacku, prema [research.md](research.md) i [API ugovoru](contracts/api.md). Backend automatski učitava backend/.env, sa postojećim env promenljivama kao prioritetom.

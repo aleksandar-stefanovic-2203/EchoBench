@@ -83,4 +83,10 @@ Za isti sintetički skup uporediti vreme ručnog pregleda i vreme do pregledanog
 
 ## Šta ostaje otvoreno
 
-Tri produktne odluke u README-u primenjene su nakon korisnikovog naloga za početak implementacije. Izbor modela, inference provajdera, pristupa i formata dokazivanja Kaggle rada rešava se pre AI faze i ne blokira prototip anketa.
+Tri produktne odluke u README-u primenjene su nakon korisnikovog naloga za početak implementacije. Istog dana korisnik je odobrio Gemma API implementaciju i potvrdio obim: sve predaje iz izabrane ankete.
+
+## Odluka u nastavku — Gemini API za Gemmu
+
+Google zvanično podržava hosted Gemma modele preko Gemini API-ja i navodi `gemma-4-26b-a4b-it` i `gemma-4-31b-it`. Izabran je prvi kao konfigurabilna podrazumevana vrednost. Potreban je Google AI Studio ključ, isti tip ključa kao za Gemini API; model koji aplikacija poziva ostaje Gemma. [Izvor, proveren 2026-10-10](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
+
+Koristimo native fetch i generateContent REST endpoint bez novog SDK-a. Prompt traži JSON koji backend strogo proverava. Ulaz se grupiše, svi parcijalni sažeci se spajaju; ukupan deadline i API greške sprečavaju predstavljanje nepotpune obrade kao uspeha. Automatske provere koriste simulirane odgovore; stvarna dostupnost modela za korisnikov nalog, kvalitet i latencija nisu izmereni bez ključa. Kaggle notebook i njegovi rezultati ostaju otvoren deo hakatonskog zahteva.

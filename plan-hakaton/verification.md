@@ -1,5 +1,7 @@
 # Provere prve implementacione faze
 
+Ovaj početni odeljak čuva istorijske rezultate prve faze. Aktuelna Gemma implementacija i njene provere su u odeljku „Druga faza — Gemma API” na kraju dokumenta.
+
 **Datum:** 10. oktobar 2026. **Okruženje:** Windows, Node 22.20.0, npm 10.9.3, Microsoft Edge preko Playwright-a. Node 24 LTS ostaje preporučeno okruženje; nije zasebno izvršno testiran u ovoj sesiji.
 
 ## Rezultati
@@ -50,3 +52,26 @@ Provereni su before/after_implement i before/after_tasks hookovi iz `.specify/ex
 ## Ograničenja i naredna faza
 
 Podaci ostaju samo u memoriji jednog procesa i restart ih briše. Lozinke su obični stringovi prema odobrenom prototipskom planu. Nema baze, deployment-a, mejl verifikacije niti AI poziva. Gemma, Kaggle notebook i procena korisnosti sažetka ostaju posebna naredna faza. Constitution ostaje šablon; nije tvrdnja da su projektna pravila formalno usvojena. Raniji reviewer-owned checklist nije menjan.
+
+## Druga faza — Gemma API
+
+**Datum:** 10. oktobar 2026. Korisnik je odobrio nastavak i potvrdio sve predaje iz izabrane ankete kao obim. Placeholder je zamenjen stvarnim backend Gemma REST adapterom. Backend automatski učitava backend/.env, a backend/.env.example sadrži GEMINI_API_KEY, GEMMA_MODEL i SUMMARY_TIMEOUT_MS. Nema novih runtime zavisnosti niti promene memorijskog čuvanja.
+
+| Provera | Rezultat |
+| --- | --- |
+| Backend `npm.cmd test` | 23/23 testova prolazi, uključujući 7 novih summary API/provider testova |
+| Root `npm.cmd run build` | Backend TypeScript i Angular production build prolaze |
+| Root `npm.cmd run test:e2e` | 3/3 Edge browser testa prolaze (15,7 s) |
+| Browser demo 10 × 200 | Lista 191 ms, detalji 197 ms |
+| Vizuelni pregled | Pregledan ceo organizer-detail screenshot sa sažetkom i oznakom novih odgovora |
+| Git whitespace | `git diff --check` prolazi |
+
+Summary testovi proveravaju sesiju/vlasništvo, praznu anketu, odbijanje kopije odgovora u telu zahteva, sve predaje i nazive checkbox opcija, odsustvo kontakata/login metapodataka, stabilan snapshot tokom novih predaja, blokiranje duplih poslova i oslobađanje posle greške. Adapter testovi proveravaju Gemma URL i ključ u header-u, grupisanje velikog ulaza sa markerom svake predaje, spajanje, nepostojeću konfiguraciju, odbijanje Gemini modela, upstream 403/429/500, nevalidan JSON/schema, prekinut izlaz i timeout.
+
+Browser proverava stvarni frontend POST sa praznim telom, simuliranu API grešku, ponovni pokušaj, disabled stanje tokom obrade, rezultat i oznaku zastarelosti nakon nove predaje/osvežavanja. Browser summary endpoint i Google odgovori u testovima su simulirani: stvarna Gemma dostupnost, kvalitet i latencija nisu potvrđeni jer ključ još nije dostavljen. Nema tvrdnje da mock rezultat predstavlja izvršen model poziv. Sažetak se vraća samo ako sve grupe i spajanja uspeju; broj predaja označava snapshot, ne dokazuje kvalitet AI zaključaka.
+
+Pokretanje Playwright-a u sandbox-u naišlo je na Windows tsx/userInfo i Angular pristup nadređenim direktorijumima. Završna provera je izvršena sa zasebno pokrenutim kompajliranim backendom i Angular dev serverom sa potrebnim pristupom, uz postojeće Playwright server reuse podešavanje. Root zavisnosti instalirane su kroz npm ci; offline pokušaj nije imao Playwright u kešu.
+
+Pre/posle implementacije provereni su `.specify/extensions.yml` hookovi: samo opcioni Git commit (`$speckit-git-commit`), nije izvršen. Prerequisite provera vraća plan-hakaton kao FEATURE_DIR. Reviewer checklist nije menjan; ranija odobrenja i aktuelni izričit zahtev za nastavak pokrivaju njegove otvorene istorijske stavke.
+
+**Preostalo za hakatonski demo:** uneti korisnikov ključ i izvršiti stvaran Gemma poziv na sintetičkim odgovorima; proveriti nalaze i izmeriti vreme/korisnost; pripremiti Kaggle notebook i dokaz rada. Ostala postojeća pravila prototipa važe.

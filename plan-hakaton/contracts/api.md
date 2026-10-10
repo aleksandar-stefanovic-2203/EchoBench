@@ -127,18 +127,24 @@ Pravila iz modela podataka važe i kada neko zaobiđe frontend i direktno pozove
 
 API za odgovore, detalje, izmenu i objavljivanje proverava vlasnika. Javne rute ne vraćaju organizatorske podatke, kontakte ili listu predaja. Javni token služi pristupu formi, a ne organizatorskom pristupu.
 
-## Rezervisano za kasnije — AI
+## AI sažetak — druga faza
 
-`POST /api/surveys/:id/summary` je **samo budući ugovor**. U prvoj fazi ne dodajemo ovu rutu, SDK niti stub koji glumi AI. Frontend handler za „Sumiraj” samo prikazuje poruku da AI još nije povezan.
+`POST /api/surveys/:id/summary` je implementiran u `backend/src/summaries/index.ts`. Zahtev nema telo ili šalje `{}`; dodatna polja se odbijaju sa 422. Odgovor je 200 `{summary: {overview, themes, positiveHighlights, improvements, suggestedActions, surveyId, responseCount, generatedAt, model}}`.
 
-Kasnije ruta zahteva vlasničku sesiju, bez liste odgovora u request body-ju. Backend sam uzima sve predaje ankete u trenutku zahteva. Ne prihvata mejlove, lozinke ili kopiju odgovora sa frontenda kao izvor istine.
+Ruta zahteva vlasničku sesiju, bez liste odgovora u request body-ju. Backend sam uzima sve predaje ankete u trenutku zahteva. Ne prihvata mejlove, lozinke ili kopiju odgovora sa frontenda kao izvor istine. Tuđi/nepostojeći resurs vraća 404; nevažeća sesija 401.
 
-Predlog internog `SummaryProvider.summarize(input)`:
+Interni `SummaryProvider.summarize(input)`:
 
-- Ulaz: naslov/opis, pitanja i opcije, sadržaj svake predaje bez mejla i sesijskih podataka.
+- Ulaz: naslov/opis i sve predaje sa tekstom pitanja i vrednostima; checkbox ID-jevi postaju nazivi izabranih opcija. Nema kontaktnog mejla, submission ID-ja, datuma predaje, vlasnika, lozinke ni tokena. Slobodni tekst autora ostaje sadržaj za analizu.
 - Izlaz: `overview`, `themes[]`, `positiveHighlights[]`, `improvements[]`, `suggestedActions[]`.
 - Backend dopunjava `surveyId`, `responseCount`, `generatedAt`, `model`.
-- Nema odgovora: 409; model nije konfigurisan/dostupan: 503; timeout: 504.
+- Nema odgovora ili već postoji aktivan zahtev za tu anketu: 409; model nije konfigurisan/dostupan ili API kvota: 503; timeout: 504; nevalidan/prazan/prekinut izlaz: 502.
 - Greška modela se ne predstavlja kao uspešan sažetak.
 
-Izlaz je željeni aplikacioni format, ne tvrdnja da ga još neizabrani model automatski garantuje. Kasnija implementacija validira rezultat, ograničava vreme poziva, tretira tekst feedbacka kao podatke i rešava dužinu konteksta. Sažetak je zastareo ako posle njegovog snapshot-a stignu nove predaje; prikaz treba da pokaže koliko ih je obrađeno.
+Provider poziva Google `generateContent` REST API, sa ključem u `x-goog-api-key` header-u. Samo naziv `gemma-*` prihvata se u konfiguraciji; nema zamene Gemini modelom. Podrazumevani model je `gemma-4-26b-a4b-it`, prema [Google dokumentaciji](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
+
+Rezultat se validira: overview je neprazan string do 1000 znakova; svaki od četiri niza ima do 6 nepraznih stringova do 250 znakova. JSON code fence je dozvoljen, drugi tekst i nevalidan JSON se odbijaju. Provider zahteva završen model odgovor (`STOP`). Feedback se u prompt-u tretira kao podatak, ne instrukcija; taj prompt sam ne garantuje tačnost zaključaka.
+
+Svaki odgovor na pitanje je fragment označen rednim brojem predaje. Fragmenti ulaze u grupe do 24.000 serijalizovanih znakova, sa kontekstom naslova/opisa; parcijalni rezultati se rekurzivno spajaju. Nijedna predaja se ne odbacuje zbog dužine. Ukupni rok za sve pozive je `SUMMARY_TIMEOUT_MS` (120.000 ms). Ako obrada ne uspe, ne vraća se parcijalni rezultat kao konačan sažetak.
+
+Sažetak je zastareo ako posle njegovog snapshot-a stignu nove predaje; prikaz pokazuje obrađeni broj i posle osvežavanja označava nove odgovore. Ne dodajemo Summary kolekciju niti disk persistenciju.
