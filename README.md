@@ -53,7 +53,7 @@ E2E koristi instalirani Microsoft Edge i automatski pokreće oba servera kada ni
 ## Ponašanje prototipa
 
 - Registracija, prijava, odjava i sesije od 24 sata. Samo token se čuva u `sessionStorage`.
-- Tekstualna i checkbox pitanja, obavezna ili opciona. Nacrt se može menjati; objavljena anketa je zaključana i ima stabilan javni link.
+- Tekstualna, checkbox (više izbora) i multiple choice (jedan izbor) pitanja, obavezna ili opciona. Nacrt se može menjati; objavljena anketa je zaključana i ima stabilan javni link.
 - Mejl učesnika je obavezan, čuva se odvojeno i ne vraća u organizatorski pregled. Nema verifikacije mejla niti tvrdnje o potpunoj anonimnosti.
 - Isti mejl može ponovo da popuni anketu. Retry istog zahteva ne pravi dodatnu predaju; isti ključ sa drugim sadržajem daje konflikt.
 - Lozinke se po dogovorenom planu čuvaju kao obični stringovi u memoriji. Ovo je lokalni demo prototip.

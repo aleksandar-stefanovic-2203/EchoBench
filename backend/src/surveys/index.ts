@@ -21,15 +21,15 @@ export function surveyInput(input: unknown) {
   if (!Array.isArray(body.questions) || body.questions.length < 1 || body.questions.length > 30) v.fail('questions', 'Dodajte od 1 do 30 pitanja.');
   else body.questions.forEach((raw, index) => {
     const p = `questions.${index}`;
-    const q = v.object(raw, p, raw?.type === 'checkbox' ? ['id', 'type', 'label', 'required', 'options'] : ['id', 'type', 'label', 'required']);
+    const q = v.object(raw, p, raw?.type === 'checkbox' || raw?.type === 'multiple_choice' ? ['id', 'type', 'label', 'required', 'options'] : ['id', 'type', 'label', 'required']);
     const id = v.id(q.id, `${p}.id`); if (ids.has(id)) v.fail(`${p}.id`, 'ID pitanja mora biti jedinstven.'); ids.add(id);
     const label = v.string(q.label, `${p}.label`, 1, 300);
     if (typeof q.required !== 'boolean') v.fail(`${p}.required`, 'Obaveznost mora biti boolean.');
     const required = q.required === true;
     if (q.type === 'text') questions.push({ id, type: 'text', label, required });
-    else if (q.type === 'checkbox') {
+    else if (q.type === 'checkbox' || q.type === 'multiple_choice') {
       const options: { id: string; label: string }[] = []; const optionIds = new Set<string>(); const names = new Set<string>();
-      if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 15) v.fail(`${p}.options`, 'Checkbox pitanje mora imati od 2 do 15 opcija.');
+      if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 15) v.fail(`${p}.options`, 'Pitanje sa izborom mora imati od 2 do 15 opcija.');
       else q.options.forEach((rawOption, i) => {
         const op = `${p}.options.${i}`; const option = v.object(rawOption, op, ['id', 'label']);
         const oid = v.id(option.id, `${op}.id`); const name = v.string(option.label, `${op}.label`, 1, 150);
@@ -37,8 +37,8 @@ export function surveyInput(input: unknown) {
         if (names.has(name.toLowerCase())) v.fail(`${op}.label`, 'Nazivi opcija moraju biti različiti.');
         optionIds.add(oid); names.add(name.toLowerCase()); options.push({ id: oid, label: name });
       });
-      questions.push({ id, type: 'checkbox', label, required, options });
-    } else v.fail(`${p}.type`, 'Podržana su tekstualna i checkbox pitanja.');
+      questions.push({ id, type: q.type, label, required, options });
+    } else v.fail(`${p}.type`, 'Podržana su tekstualna, checkbox i multiple choice pitanja.');
   });
   v.done(); return { title, description, questions };
 }

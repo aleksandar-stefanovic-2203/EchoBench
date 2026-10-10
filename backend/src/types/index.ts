@@ -1,5 +1,5 @@
 export interface Option { id: string; label: string }
-export type Question = { id: string; label: string; required: boolean } & ({ type: 'text' } | { type: 'checkbox'; options: Option[] });
+export type Question = { id: string; label: string; required: boolean } & ({ type: 'text' } | { type: 'checkbox' | 'multiple_choice'; options: Option[] });
 export interface Answer { questionId: string; value: string | string[] }
 export interface Organizer { id: string; username: string; usernameKey: string; email: string; password: string; createdAt: string }
 export interface Session { token: string; organizerId: string; createdAt: string; expiresAt: string }

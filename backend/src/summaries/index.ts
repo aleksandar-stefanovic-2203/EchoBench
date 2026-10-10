@@ -105,7 +105,7 @@ export function summariesRouter(store: Store, provider: SummaryProvider) {
     if (pending.has(survey.id)) throw new ApiError(409, 'SUMMARY_IN_PROGRESS', 'Sažimanje ove ankete je već u toku.');
     const input: SummaryInput = { title: survey.title, description: survey.description, responses: submissions.map(s => ({ answers: survey.questions.map(q => {
       const value = s.answers.find(a => a.questionId === q.id)!.value;
-      return { question: q.label, value: q.type === 'checkbox' && Array.isArray(value) ? q.options.filter(o => value.includes(o.id)).map(o => o.label) : value };
+      return { question: q.label, value: q.type !== 'text' ? Array.isArray(value) ? q.options.filter(o => value.includes(o.id)).map(o => o.label) : q.options.find(o => o.id === value)?.label ?? '' : value };
     }) })) };
     pending.add(survey.id);
     try {

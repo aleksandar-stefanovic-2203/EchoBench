@@ -16,7 +16,7 @@ async function setup() {
   const id = created.body.survey.id;
   const published = await request(app).post(`/api/surveys/${id}/publish`).auth(token, { type: 'bearer' });
   const publicToken = published.body.survey.shareUrl.split('/').at(-1);
-  const submit = () => request(app).post(`/api/public/surveys/${publicToken}/responses`).send({ clientRequestId: randomUUID(), respondentEmail: 'private@example.com', answers: body.questions.map(q => ({ questionId: q.id, value: q.type === 'text' ? 'Dobar feedback' : q.options!.map(o => o.id) })) });
+  const submit = () => request(app).post(`/api/public/surveys/${publicToken}/responses`).send({ clientRequestId: randomUUID(), respondentEmail: 'private@example.com', answers: body.questions.map(q => ({ questionId: q.id, value: q.type === 'text' ? 'Dobar feedback' : q.type === 'multiple_choice' ? q.options[0].id : q.options.map(o => o.id) })) });
   return { app, token, id, summarize, submit };
 }
 describe('summary ownership and snapshot', () => {

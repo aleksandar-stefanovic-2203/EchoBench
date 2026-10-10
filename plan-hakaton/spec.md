@@ -34,7 +34,7 @@ Organizator pravi anketu i objavljuje je generisanjem linka.
 
 1. Nova anketa ima naslov, opcioni opis i najmanje jedno pitanje.
 2. Organizator dodaje, menja i uklanja pitanja dok je anketa nacrt; prikaz čuva redosled pitanja iz editora.
-3. Checkbox pitanje ima najmanje dve različite opcije i dozvoljava izbor više opcija.
+3. Checkbox pitanje ima najmanje dve različite opcije i dozvoljava izbor više opcija; multiple choice pitanje ima najmanje dve različite opcije i dozvoljava izbor tačno jedne opcije.
 4. Svako pitanje nezavisno može biti obavezno ili neobavezno.
 5. Neispravna anketa se ne čuva; korisnik vidi polja koja treba da ispravi.
 6. „Generiši link” objavljuje sačuvan nacrt; ponovni zahtev vraća isti link.
@@ -109,7 +109,7 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 - **FR-001:** Registracija, prijava i odjava organizatora po US-01.
 - **FR-002:** Samo vlasnik pristupa privatnim detaljima ankete i odgovorima; pravilo proveriti pri svakom privatnom pristupu.
 - **FR-003:** Kreiranje i izmena validnog nacrta sa naslovom, opisom i uređenom listom pitanja.
-- **FR-004:** Tekstualni odgovor i checkbox izbor više opcija, uz nezavisnu obaveznost.
+- **FR-004:** Tekstualni odgovor, checkbox izbor više opcija i multiple choice izbor jedne opcije, uz nezavisnu obaveznost.
 - **FR-005:** Objavljivanje stabilnim javnim linkom; ponovni zahtev vraća isti link.
 - **FR-006:** Objavljen sadržaj ankete ostaje nepromenjen u ovom obimu.
 - **FR-007:** Popunjavanje javne ankete bez naloga uz obavezan mejl.
@@ -144,7 +144,7 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 
 - Posle pregleda plana korisnik je 2026-10-10 zatražio implementaciju: mejl je skriven organizatoru, namerna ponovna predaja istim mejlom je dozvoljena, a objavljena pitanja su zaključana.
 - Interfejs je na srpskom, latinicom; sadržaj anketa može biti na drugim jezicima.
-- Checkbox znači više mogućih izbora; tekstualno pitanje koristi višeredni unos.
+- Checkbox znači više mogućih izbora, multiple choice znači jedan izbor; tekstualno pitanje koristi višeredni unos.
 - Mejl se sintaksno proverava, ali se vlasništvo nad adresom ne potvrđuje.
 - Jedan organizator poseduje svaku anketu. Nema administrativne uloge, timskih naloga niti posebnog modula za upravljanje događajem.
 - Jedna serverska instanca i privremeni podaci su dovoljan obim prototipa.

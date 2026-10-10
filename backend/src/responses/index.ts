@@ -28,9 +28,12 @@ export function submissionInput(input: unknown, survey: Survey) {
     if (q.type === 'text') {
       const text = v.string(value, path, q.required ? 1 : 0, 2000);
       answers.push({ questionId: q.id, value: text });
-    } else {
+    } else if (q.type === 'checkbox') {
       if (!Array.isArray(value) || !value.every(o => typeof o === 'string' && q.options.some(opt => opt.id === o)) || new Set(value).size !== value.length || (q.required && value.length === 0)) v.fail(path, q.required ? 'Izaberite najmanje jednu važeću opciju, bez ponavljanja.' : 'Izaberite važeće opcije, bez ponavljanja.');
       answers.push({ questionId: q.id, value: Array.isArray(value) ? [...value].sort() : [] });
+    } else {
+      if (typeof value !== 'string' || !q.options.some(opt => opt.id === value) || (q.required && !value)) v.fail(path, q.required ? 'Izaberite jednu važeću opciju.' : 'Izaberite važeću opciju.');
+      answers.push({ questionId: q.id, value: typeof value === 'string' ? value : '' });
     }
   });
   v.done(); return { clientRequestId, email, answers };
