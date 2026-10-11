@@ -127,24 +127,32 @@ Pravila iz modela podataka važe i kada neko zaobiđe frontend i direktno pozove
 
 API za odgovore, detalje, izmenu i objavljivanje proverava vlasnika. Javne rute ne vraćaju organizatorske podatke, kontakte ili listu predaja. Javni token služi pristupu formi, a ne organizatorskom pristupu.
 
-## AI sažetak — druga faza
+## AI sažetak, poređenje i analitika
 
-`POST /api/surveys/:id/summary` je implementiran u `backend/src/summaries/index.ts`. Zahtev nema telo ili šalje `{}`; dodatna polja se odbijaju sa 422. Odgovor je 200 `{summary: {overview, themes, positiveHighlights, improvements, suggestedActions, surveyId, responseCount, generatedAt, model}}`.
+**Aktuelna verzija 2026-10-11:** endpoint poredi sve ankete istog vlasnika i vraća proverljive izvore. Nizovi `themes`, `positiveHighlights`, `improvements`, `suggestedActions` sadrže objekte `{text, sourceIds[]}`. Pregled je do 1500 znakova, kategorije do 12 stavki po 500 znakova; svaka stavka zahteva bar jednu postojeću referencu na neprazan odgovor ciljne ankete.
 
-Ruta zahteva vlasničku sesiju, bez liste odgovora u request body-ju. Backend sam uzima sve predaje ankete u trenutku zahteva. Ne prihvata mejlove, lozinke ili kopiju odgovora sa frontenda kao izvor istine. Tuđi/nepostojeći resurs vraća 404; nevažeća sesija 401.
+Odgovor dodatno sadrži `sources[] = {sourceId, surveyId, surveyTitle, submissionId, questionId, responseNumber, questionNumber, question, value}`, samo za ciljni događaj, i `snapshotSurveys[] = {id,title,responseCount}` za vlasnički skup. Brojevi predaja su redosled upisa (najstariji=1), pitanja redosled forme. `comparison = {method,criteria[],events[]}`: kriterijum ima id/label/description, target/others `{score:number|null,responseCount}`, difference u poenima ili null. Events daje pojedinačne ocene ostalih sopstvenih anketa. Tuđe ankete nikada ne ulaze u model ili rezultat.
+
+`analytics[] = {questionId,label,type,responseCount,answeredCount,unansweredCount,completionPercent,options:[{label,count,percent}]}` računa backend iz sirovih predaja pre async poziva, sa svim predajama kao denominatorom. Checkbox može imati više izbora. Nema automatskog tumačenja proizvoljnih oznaka opcija kao numeričkog rejtinga.
+
+Interni AI izlaz dodaje `assessments[] = {sourceId,criterionId,sentiment:positive|neutral|negative}` za šest kriterijuma. Svaki par sourceId/criterionId je jedinstven i ima postojeću nepraznu referencu. Score nije zadovoljstvo u procentima: prvo prosečni sentiment (100/50/0) odgovora u predaji po kriterijumu, zatim prosek predaja. Benchmark isključuje cilj i ponderiše po relevantnim predajama. Bez podataka score=null. Klasifikacije svih grupa čuvaju se pri spajanju; AI merge ne određuje ocene ponovo. Unija citata po kategoriji mora se očuvati. Provere potvrđuju format i postojanje izvora, ne garantuju semantičku tačnost ili potpunost AI nalaza.
+
+`POST /api/surveys/:id/summary` je implementiran u `backend/src/summaries/index.ts`. Zahtev nema telo ili šalje `{}`; dodatna polja se odbijaju sa 422. Odgovor je 200 `{summary: {overview, themes, positiveHighlights, improvements, suggestedActions, surveyId, responseCount, generatedAt, model, sources, comparison, analytics, snapshotSurveys}}`.
+
+Ruta zahteva vlasničku sesiju, bez liste odgovora u request body-ju. Backend sam uzima sve predaje ciljne ankete i ostalih anketa istog vlasnika u trenutku zahteva. Ne prihvata mejlove, lozinke ili kopiju odgovora sa frontenda kao izvor istine. Tuđi/nepostojeći resurs vraća 404; nevažeća sesija 401.
 
 Interni `SummaryProvider.summarize(input)`:
 
-- Ulaz: naslov/opis i sve predaje sa tekstom pitanja i vrednostima; checkbox ID-jevi postaju nazivi izabranih opcija. Nema kontaktnog mejla, submission ID-ja, datuma predaje, vlasnika, lozinke ni tokena. Slobodni tekst autora ostaje sadržaj za analizu.
-- Izlaz: `overview`, `themes[]`, `positiveHighlights[]`, `improvements[]`, `suggestedActions[]`.
+- Interni snapshot: naslov/opis, sopstvene ankete i svi odgovori sa referencama. U Google payload-u koriste se samo kratki sourceId, oznaka event=target/otherN, tekst pitanja i vrednost; checkbox/multiple-choice ID-jevi postaju nazivi opcija. Originalni submission/question ID-jevi ostaju na backendu i u vlasničkom rezultatu. Nema kontaktnog mejla, datuma predaje, vlasnika, lozinke ni tokena u AI pozivu. Slobodni tekst autora ostaje sadržaj za analizu.
+- Izlaz: `overview`, `themes[]`, `positiveHighlights[]`, `improvements[]`, `suggestedActions[]` i interne `assessments[]`.
 - Backend dopunjava `surveyId`, `responseCount`, `generatedAt`, `model`.
 - Nema odgovora ili već postoji aktivan zahtev za tu anketu: 409; model nije konfigurisan/dostupan ili API kvota: 503; timeout: 504; nevalidan/prazan/prekinut izlaz: 502.
 - Greška modela se ne predstavlja kao uspešan sažetak.
 
 Provider poziva Google `generateContent` REST API, sa ključem u `x-goog-api-key` header-u. Samo naziv `gemma-*` prihvata se u konfiguraciji; nema zamene Gemini modelom. Podrazumevani model je `gemma-4-26b-a4b-it`, prema [Google dokumentaciji](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
 
-Rezultat se validira: overview je neprazan string do 1000 znakova; svaki od četiri niza ima do 6 nepraznih stringova do 250 znakova. JSON code fence je dozvoljen, drugi tekst i nevalidan JSON se odbijaju. Provider zahteva završen model odgovor (`STOP`). Feedback se u prompt-u tretira kao podatak, ne instrukcija; taj prompt sam ne garantuje tačnost zaključaka.
+Rezultat se validira prema trenutnom obliku iznad. JSON code fence je dozvoljen, drugi tekst i nevalidan JSON se odbijaju. Provider zahteva završen model odgovor (`STOP`). Greška 502 ima kod `SUMMARY_INVALID_*` sa bezbednom oznakom razloga (format, referenca ili završetak odgovora), bez ključa ili sirovog AI sadržaja. Feedback se u prompt-u tretira kao podatak, ne instrukcija; taj prompt sam ne garantuje tačnost zaključaka.
 
-Svaki odgovor na pitanje je fragment označen rednim brojem predaje. Fragmenti ulaze u grupe do 24.000 serijalizovanih znakova, sa kontekstom naslova/opisa; parcijalni rezultati se rekurzivno spajaju. Nijedna predaja se ne odbacuje zbog dužine. Ukupni rok za sve pozive je `SUMMARY_TIMEOUT_MS` (120.000 ms). Ako obrada ne uspe, ne vraća se parcijalni rezultat kao konačan sažetak.
+Svaki odgovor na pitanje je fragment označen sourceId referencom. Događaji se analiziraju odvojeno prema istoj rubrici, da instrukcije za cilj ne potisnu klasifikacije ostalih događaja. Fragmenti po događaju ulaze u grupe do 24.000 serijalizovanih znakova; parcijalni nalazi ciljnog događaja se rekurzivno spajaju, a klasifikacije svih događaja zadržavaju. Nijedna predaja se ne odbacuje zbog dužine. Ukupni rok za sve pozive je `SUMMARY_TIMEOUT_MS` (120.000 ms, dozvoljeno do 600.000). Gemma 4 koristi thinkingLevel=minimal. Ako obrada ne uspe, ne vraća se parcijalni rezultat kao konačan sažetak.
 
 Sažetak je zastareo ako posle njegovog snapshot-a stignu nove predaje; prikaz pokazuje obrađeni broj i posle osvežavanja označava nove odgovore. Ne dodajemo Summary kolekciju niti disk persistenciju.

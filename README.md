@@ -37,6 +37,18 @@ Za AI unesite Google AI Studio ključ u `GEMINI_API_KEY`; ključ ostaje u ignori
 
 Sažetak koristi snapshot svih odgovora iz jedne ankete, pretvara checkbox ID-jeve u nazive i ne šalje kontaktne mejlove niti podatke za prijavu. Veći ulaz obrađuje u grupama i spaja nalaze. Prikazuje broj obrađenih predaja, vreme i model; osvežavanje odgovora označava zastareo sažetak. Bez ključa ostatak aplikacije radi, a „Sumiraj” prikazuje jasnu grešku. Sažetak ostaje samo u otvorenom prikazu i ne čuva se na disku. Slobodni tekst pitanja/odgovora može sadržati lične podatke koje je autor sam uneo; izdvojeni kontakt ne ulazi u AI payload.
 
+## Poređenje i ručni demo
+
+Summary sada poredi izabrani događaj sa ostalim sopstvenim anketama po šest kriterijuma, prikazuje tačnu analitiku izbora i omogućava klik na nalaz za otvaranje izvornih odgovora. Ocene kriterijuma su AI procene; procenti izbora računaju se direktno na backendu. Tuđi događaji nisu deo poređenja.
+
+Za ručno testiranje, sa pokrenutim backendom:
+
+```powershell
+node backend/scripts/seed-demo.mjs
+```
+
+Na http://localhost:4200 prijavite se sa **demo@gemmify.test** / **Seminar123!**. Dobijate tri demo seminara sa po šest sintetičkih predaja. Otvorite „Demo · AI seminar — hladna sala”, kliknite „Sumiraj”, zatim nalaz o temperaturi. Ispod nalaza se otvaraju izvorni odgovori, a niže poređenje i procenti. Restart prazni memoriju; demo skripta ponovo priprema podatke. `node backend/scripts/check-demo-summary.mjs` opcionalno troši jedan summary zahtev za stvarnu API proveru.
+
 ## Provere
 
 Iz korena:

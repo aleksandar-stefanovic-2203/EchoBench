@@ -141,6 +141,18 @@ Provider deli odgovore po pitanjima u grupe do 24.000 znakova i spaja parcijalne
 
 Kaggle notebook treba da pokaže rad sa izabranim Gemma modelom nad sintetičkim feedbackom i dokumentuje nalaze. Ne pretpostavljamo da notebook već predstavlja stabilan API server. Velike skupove odgovora kasnije treba obrađivati u grupama bez tihog odbacivanja predaja. Ugovor i očekivani izlaz su u [contracts/api.md](contracts/api.md).
 
+## Treća faza — poređenje, analitika i izvori
+
+Korisnik je 2026-10-11 odobrio poređenje izabranog događaja sa svim ostalim sopstvenim anketama. U ovom modelu jedna anketa predstavlja jedan događaj; ankete drugih organizatora nikada ne ulaze u snapshot. Poređenje uključuje i događaje bez predaja, sa oznakom da nema ocene. Postojeća pravila memorijskog čuvanja, prijave i privatnosti ostaju.
+
+Šest kriterijuma su organizacija, sadržaj, predavači, praksa/interakcija, prostor/uslovi i logistika/pauze. Gemma zasebno analizira svaki događaj istim kriterijumima i označava pozitivan, negativan ili neutralan/mešovit stav samo kada je kriterijum pomenut u konkretnom odgovoru. Nalazi ostalih događaja ne prikazuju se kao nalazi ciljnog; njihove klasifikacije ulaze u benchmark. Backend računa indeks 0–100: positive=100, neutral=50, negative=0; prvo prosek odgovora unutar jedne predaje po kriterijumu, zatim prosek predaja. Benchmark objedinjeno koristi predaje ostalih događaja, bez ciljnog. Nema dokaza znači null, a ne 0. To je AI procena, ne izmeren procenat zadovoljnih učesnika. Svaki događaj može imati više grupa; sve zajedno imaju isti ukupni deadline. Za Gemma 4 thinkingLevel=minimal smanjuje nepotrebnu obradu.
+
+Svaki odgovor na pitanje ima privremeni sourceId u snapshot-u. AI nalazi su `{text, sourceIds[]}`; backend proverava postojanje reference, neprazan sadržaj i vlasništvo ciljne ankete. Originalni survey/submission/question ID-jevi i redni brojevi ostaju u dozvoljenom snapshot-u za prikaz. Klik na nalaz odmah otvara tačan tekst i naziv ankete, redni broj predaje i pitanja. Pri spajanju grupa mora se zadržati unija referenci po kategoriji; u suprotnom nema uspešnog rezultata. Prompt traži sve odgovore koji podržavaju istu temu. Validacija referenci ne garantuje semantičku tačnost niti da AI nije propustio neku žalbu; organizator proverava izvore.
+
+Backend računa analitiku zasebno iz sirovih odgovora pre AI poziva: popunjenost i nedostajuće odgovore po pitanju, broj i procenat svakog checkbox/multiple-choice izbora. Osnova su sve predaje ciljane ankete; višestruki izbor može dati zbir iznad 100%. Angular prikazuje horizontalne grafikone, poređenje i proširive izvore u posebnoj SummaryPanel komponenti.
+
+Demo skripta `backend/scripts/seed-demo.mjs` kreira tri seminara sa po šest sintetičkih predaja i nalogom demo@gemmify.test / Seminar123!. Skripta koristi regularni API i ne menja postojeće naloge; ponovni poziv preskače već popunjene demo ankete. Podaci ostaju samo u RAM-u; nakon restarta skripta ponovo priprema demo. `check-demo-summary.mjs` izvršava jedan stvarni AI poziv i ispisuje nalaze bez ključa/tokena.
+
 ## Complexity Tracking
 
 Najveća ograničenja su namerna: jedan proces, gubitak podataka pri restartu i prototipske lozinke. AI druga faza zavisi od korisnikovog ključa, pristupa modelu i API kvote. Kaggle dokaz rada ostaje za završni demo. Nema dodatne infrastrukture za ovaj obim.

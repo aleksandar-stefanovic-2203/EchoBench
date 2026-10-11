@@ -140,6 +140,14 @@ Organizator u detaljima ankete vidi „Sumiraj”.
 - **SC-005:** „Sumiraj” prikazuje validan AI rezultat za sve predaje snapshot-a ili jasnu grešku bez lažnog uspeha.
 - **SC-006:** Na dogovorenom lokalnom demo uređaju, sa 10 anketa i po 200 predaja, lista i detalji se otvaraju za do dve sekunde u normalnim uslovima. Ovo je cilj za proveru, ne izmeren rezultat.
 
+## Nastavak 2026-10-11: poređenje i poreklo nalaza
+
+- **FR-016:** „Sumiraj” poredi izabranu anketu/događaj sa svim drugim anketama istog organizatora po šest kriterijuma iz plana. Ne postoji pristup tuđim podacima.
+- **FR-017:** Prikaz prikazuje AI indeks 0–100, broj relevantnih predaja, benchmark ostalih događaja i razliku u poenima. Za nepomenut kriterijum prikazuje „Nema podataka”. Metod računanja je vidljiv.
+- **FR-018:** Svaki AI nalaz ima proverene reference na predaje i pitanja ciljnog događaja. Klik otvara izvorne odgovore odmah ispod nalaza. Izmišljeni ID-jevi i reference na druge događaje odbijaju rezultat.
+- **FR-019:** Analitika izbora i popunjenosti računa se iz svih predaja snapshot-a. Prikazuje brojeve, procente i grafikon; objašnjava osnovu i višestruki izbor.
+- **FR-020:** Organizator može ručno testirati demo seminare sa različitim utiscima. Demo je sintetički i ponovljivo se kreira regularnim API-jem.
+
 ## Assumptions
 
 - Posle pregleda plana korisnik je 2026-10-10 zatražio implementaciju: mejl je skriven organizatoru, namerna ponovna predaja istim mejlom je dozvoljena, a objavljena pitanja su zaključana.

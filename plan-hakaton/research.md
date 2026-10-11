@@ -90,3 +90,9 @@ Tri produktne odluke u README-u primenjene su nakon korisnikovog naloga za poče
 Google zvanično podržava hosted Gemma modele preko Gemini API-ja i navodi `gemma-4-26b-a4b-it` i `gemma-4-31b-it`. Izabran je prvi kao konfigurabilna podrazumevana vrednost. Potreban je Google AI Studio ključ, isti tip ključa kao za Gemini API; model koji aplikacija poziva ostaje Gemma. [Izvor, proveren 2026-10-10](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
 
 Koristimo native fetch i generateContent REST endpoint bez novog SDK-a. Prompt traži JSON koji backend strogo proverava. Ulaz se grupiše, svi parcijalni sažeci se spajaju; ukupan deadline i API greške sprečavaju predstavljanje nepotpune obrade kao uspeha. Automatske provere koriste simulirane odgovore; stvarna dostupnost modela za korisnikov nalog, kvalitet i latencija nisu izmereni bez ključa. Kaggle notebook i njegovi rezultati ostaju otvoren deo hakatonskog zahteva.
+
+### Nastavak 2026-10-11
+
+Ključ je konfigurisan i stvarni pozivi su provereni u nastavku (rezultati u verification.md). Google za Gemma 4 dokumentuje thinkingLevel=minimal kao isključivanje thinking obrade; koristi se za strukturirano sumiranje da smanji vreme. [Zvanična dokumentacija](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
+
+Poređenje po šest zajedničkih kriterijuma izvodi se zasebnom analizom svakog događaja. Prvobitni zajednički prompt u stvarnoj proveri dao je sažetak cilja, ali je propustio klasifikacije ostalih događaja. Odvojeni pozivi uklanjaju konflikt ciljnog narativa i benchmark-a; samo klasifikacije drugih događaja ulaze u konačni rezultat. AI ne računa procente ni benchmark aritmetiku. Backend validira reference i računa indekse/procente, a UI pokazuje granicu AI procene i tačnog brojanja. Jednake duplirane reference se normalizuju; nepoznati izvori se i dalje odbijaju.

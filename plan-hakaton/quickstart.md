@@ -69,6 +69,10 @@ Provere: backend `npm test`, root `npm run build` (backend TypeScript i Angular 
 
 ## Ručna provera UI-ja
 
+### Poređenje i klik na izvor — demo
+
+Sa pokrenutim serverima iz korena pokrenuti `node backend/scripts/seed-demo.mjs`. Prijava: `demo@gemmify.test` / `Seminar123!`. Tri demo seminara imaju po šest sintetičkih predaja; svaki ima dva tekstualna, jedno multiple-choice i jedno checkbox pitanje. Otvoriti AI seminar sa hladnom salom i kliknuti „Sumiraj”. Proveriti šest kriterijuma i benchmark prema drugim seminarima, otvoriti nalaz o temperaturi i pročitati citirane predaje/pitanja. Za problem „Niska temperatura” očekuje se tačan checkbox broj 5/6 i 83,3%. AI indeks nije taj procenat. Novi feedback u bilo kojoj anketi uključuje se pri sledećem sumiranju. Serverski podaci ostaju u RAM-u; posle restarta ponoviti demo skriptu.
+
 Proveriti prikaz na širini 360 px, tab navigaciju, oznake obaveznih polja, povezane labele, prazne liste, greške servera, zadržavanje unosa posle neuspelog slanja i mogućnost ručnog kopiranja prikazanog linka ako clipboard nije dostupan.
 
 AI adapter/API testovi koriste simulirane Google odgovore; browser test simulira summary endpoint da ne troši kvotu. Stvarnu kvalitet/vreme provere izvršiti sa korisnikovim ključem na sintetičkom feedbacku, prema [research.md](research.md) i [API ugovoru](contracts/api.md). Backend automatski učitava backend/.env, sa postojećim env promenljivama kao prioritetom.

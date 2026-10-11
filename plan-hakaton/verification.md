@@ -75,3 +75,31 @@ Pokretanje Playwright-a u sandbox-u naišlo je na Windows tsx/userInfo i Angular
 Pre/posle implementacije provereni su `.specify/extensions.yml` hookovi: samo opcioni Git commit (`$speckit-git-commit`), nije izvršen. Prerequisite provera vraća plan-hakaton kao FEATURE_DIR. Reviewer checklist nije menjan; ranija odobrenja i aktuelni izričit zahtev za nastavak pokrivaju njegove otvorene istorijske stavke.
 
 **Preostalo za hakatonski demo:** uneti korisnikov ključ i izvršiti stvaran Gemma poziv na sintetičkim odgovorima; proveriti nalaze i izmeriti vreme/korisnost; pripremiti Kaggle notebook i dokaz rada. Ostala postojeća pravila prototipa važe.
+
+## Treća faza — poređenje, analitika i izvori (2026-10-11)
+
+Korisnik je odobrio poređenje događaja po kriterijumima, analitiku formi i klik na AI nalaz sa prikazom izvornih predaja/pitanja. Šest kriterijuma, algoritam i trenutni ugovor opisani su u plan.md i contracts/api.md. Jedna anketa predstavlja događaj; koriste se isključivo ankete istog organizatora.
+
+| Provera | Rezultat |
+| --- | --- |
+| Backend npm.cmd test | 31/31 test prolazi u 6 fajlova |
+| Backend TypeScript build | Prolazi |
+| Angular production build | Prolazi; initial bundle oko 261 kB |
+| Edge npm.cmd run test:e2e | 3/3 testa prolaze, završno 15,4 s |
+| Browser demo 10 × 200 | Lista 124 ms, detalji 198 ms |
+| Mobilni summary 360 px | Bez globalnog horizontalnog skrolovanja; tabele imaju svoj scroll; screenshot pregledan |
+| Klik na nalaz | Ispod nalaza vidljivi tačan odgovor, naziv ankete, broj predaje i pitanja |
+| Navigacija iz poređenja | Otvara drugi događaj bez stale route ID-ja |
+| Stvarni Gemma summary + benchmark | HTTP 200, model gemma-4-26b-a4b-it, 98.002 ms za 3 događaja sa po 6 predaja |
+| Lokalni serveri | Frontend 200 i /api/health ok preko Angular proxy-ja; oba ostavljena pokrenuta sa demo podacima |
+| Git whitespace | git diff --check prolazi |
+
+Unit/API/adapter provere pokrivaju owner filtering sa tuđim događajima, snapshot referenci, odsustvo kontakata/login podataka, izbor naziva opcija, tačne procente i prazne odgovore, nullable kriterijume, respondent-weighted benchmark i isključivanje cilja, odbijanje izmišljenih/tuđih referenci, normalizaciju jednakih citata, očuvanje svih referenci i klasifikacija kroz merge, odvojenu analizu svakog događaja, auth/empty/duplicate-job/snapshot/retry ponašanja i bezbedne upstream/schema/timeout greške.
+
+Browser summary rezultat je simuliran radi ponovljivosti; stvarni model nezavisno je pozvan kroz regularni summary API skriptom check-demo-summary.mjs. Završni stvarni rezultat ocenio je sve druge događaje po svih šest kriterijuma. Izabrani AI seminar: organizacija 13/100 prema 90/100 kod ostalih (12 relevantnih predaja), prostor 0/100 prema 71/100 (7 relevantnih predaja), praksa 20/100 prema 38/100. Ovo su pojedinačne AI procene, ne deterministički rezultat budućih model poziva.
+
+Nalaz „Niska temperatura i prejaka klima u sali” u stvarnom rezultatu referencira S2, S4, S6, S8, S10, S12, S18, S20, S22 i S24. Ručni pregled sintetičkog ulaza potvrđuje pet tekstualnih žalbi na temperaturu i njihovih pet checkbox odgovora u predajama 1, 2, 3, 5 i 6. Backend analitika: Niska temperatura 5/6=83,3%, kratke pauze 4/6=66,7%, premalo praktičnog rada 2/6=33,3%, zvuk/internet 1/6=16,7%. Izbori organizacije: 2 veoma loša, 3 loša, 1 osrednja. Brojevi/procenti računaju se iz podataka, bez modela.
+
+Tokom razvoja stvarne provere otkrile su timeout pri podrazumevanoj thinking obradi, zanemarene benchmark klasifikacije u zajedničkom prompt-u i neispravno oblikovane stavke. Završna implementacija koristi Gemma 4 thinkingLevel=minimal, analizira svaki događaj zasebno, za ostale traži samo klasifikacije, dodaje eksplicitan JSON primer i proverava sve reference. Nevažeći izlazi nisu prikazani kao uspeh. Ceo zahtev i dalje ima konfigurisani rok 120 sekundi; veći skup ili API opterećenje mogu zahtevati viši SUMMARY_TIMEOUT_MS (do 600000 ms). Provere formata i postojanja izvora ne garantuju semantičku tačnost ili da je model obuhvatio svaku žalbu u proizvoljnom budućem ulazu.
+
+Demo nalog: demo@gemmify.test / Seminar123!. Tri sintetička seminara imaju po šest predaja; nijedan stvarni kontakt nije korišćen. Backend je ostavljen kao kompajlirani npm start proces, frontend kao Angular npm start, tako da dalji testovi ili izmene test fajlova ne resetuju demo. Restart i dalje briše RAM; seed-demo.mjs ponovo priprema podatke. API ključ/token nisu ispisani niti stavljeni u versioned fajlove. Constitution/checklist nisu menjani; opcioni Git commit hook nije izvršen. Kaggle notebook i procena korisnosti na većem označenom skupu ostaju za završni hakatonski rad.

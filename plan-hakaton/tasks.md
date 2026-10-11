@@ -69,6 +69,15 @@
 
 Stvarni API poziv i Kaggle notebook nisu predstavljeni kao završeni bez korisnikovog ključa i izvršne provere. Prva faza iznad ostaje istorijski zapis; T021–T026 zamenjuju placeholder funkciju.
 
+## Phase 10: Poređenje događaja, analitika i izvori — 2026-10-11
+
+- [X] T027 Definisati šest kriterijuma, AI procenu i povezivanje nalaza sa izvornim odgovorima; napisati red test u backend/tests/summary-analysis.test.ts.
+- [X] T028 Implementirati snapshot svih sopstvenih događaja, whitelist izvora, provere AI referenci, klasifikaciju kriterijuma i deterministički benchmark.
+- [X] T029 Implementirati tačne brojeve/procente izbora i popunjenosti iz sirovih podataka, bez AI računanja.
+- [X] T030 Implementirati klik na nalaz, citirane odgovore, poređenje i horizontalne grafikone u frontend summary panelu.
+- [X] T031 Pripremiti ponovljivu demo skriptu za tri događaja i korisnički nalog za ručne provere.
+- [X] T032 Izvršiti sve testove/build, stvarni AI poziv, dokumentovati rezultate i ostaviti lokalne servere sa demo podacima.
+
 ## Dependencies & execution order
 
 Setup → Foundation → US1 → US2 → US3 → US4 → US5 → Polish. US4 backend testovi mogu deliti pripremu sa US3; US5 zavisi od US4. Testovi se pišu pre servisa. Backend i frontend deo priče mogu se raditi nezavisno posle usaglašenog ugovora; svaka priča se proverava pre naredne.
