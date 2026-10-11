@@ -1,4 +1,4 @@
-# EventBench
+# EchoBench
 
 Event feedback: organizers create surveys, share links, and review responses; attendees respond without an account. The entire application is in English, including validation messages, demo content, and AI-generated summaries. See [AGENTS.md](AGENTS.md) for the naming and language conventions.
 
@@ -70,4 +70,4 @@ E2E tests use installed Microsoft Edge and start both servers automatically when
 - The same email can submit again. Retrying an identical request does not create another submission; reusing the request key with different content returns a conflict.
 - Passwords are stored as plain strings in memory, as specified in the original plan. This is a local demo prototype.
 
-Original specification and API contract: [plan-hakaton](plan-hakaton/README.md). Progress: [tasks.md](plan-hakaton/tasks.md). Earlier verification results: [verification.md](plan-hakaton/verification.md). These historical documents describe the original prototype; the current EventBench name and English language requirement supersede their older branding and language choices.
+Original specification and API contract: [plan-hakaton](plan-hakaton/README.md). Progress: [tasks.md](plan-hakaton/tasks.md). Earlier verification results: [verification.md](plan-hakaton/verification.md). These historical documents describe the original prototype; the current EchoBench name and English language requirement supersede their older branding and language choices.

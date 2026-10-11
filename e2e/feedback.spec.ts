@@ -6,8 +6,8 @@ test('organizer → draft → public mobile form → three responses → owner/p
   const browserErrors:string[]=[];page.on('pageerror',e=>browserErrors.push(e.message));
   await register(page,crypto.randomUUID()); await expect(page.getByText('Your first survey starts here.')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang','en');
-  await expect(page).toHaveTitle('EventBench — event feedback');
-  await expect(page.locator('a.brand')).toContainText('EventBench');
+  await expect(page).toHaveTitle('EchoBench — event feedback');
+  await expect(page.locator('a.brand')).toContainText('EchoBench');
   await page.getByRole('link',{name:'+ New survey',exact:true}).click(); await page.getByLabel('Survey title').fill('Hackathon feedback'); await page.getByLabel('Description').fill('Share your feedback.');
   await page.getByLabel('Question text').fill('What was the best part?'); await page.getByLabel('Required question').check();
   await page.getByRole('button',{name:'+ Checkbox question',exact:true}).click(); await page.getByLabel('Question text').nth(1).fill('What did you use?'); await page.getByLabel('Required question').nth(1).check(); await page.getByLabel('Option 1',{exact:true}).fill('Mentors'); await page.getByLabel('Option 2',{exact:true}).fill('Workshops');

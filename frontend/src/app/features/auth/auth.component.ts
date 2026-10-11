@@ -5,7 +5,7 @@ import { Auth } from '../../core/auth';
 import { failure, type Failure } from '../../core/models';
 import { FeedbackComponent } from '../../shared/feedback.component';
 @Component({ selector: 'app-auth', imports: [ReactiveFormsModule, RouterLink, FeedbackComponent], template: `
-  <div class="auth-layout"><section class="auth-intro"><div class="eyebrow">From feedback to better events</div><h1>Every response<br>makes a difference.</h1><p class="muted">Create a survey, share the link, and discover what mattered to your attendees.</p><p class="muted">EventBench prototype · Data lasts until the server restarts.</p></section>
+  <div class="auth-layout"><section class="auth-intro"><div class="eyebrow">From feedback to better events</div><h1>Every response<br>makes a difference.</h1><p class="muted">Create a survey, share the link, and discover what mattered to your attendees.</p><p class="muted">EchoBench prototype · Data lasts until the server restarts.</p></section>
   <section class="card"><h2>{{register ? 'Create an account' : 'Welcome back'}}</h2><p class="muted">{{register ? 'Your workspace for event feedback.' : 'Log in to view your surveys.'}}</p>
   <app-feedback [error]="error()"/>
   <form [formGroup]="form" (ngSubmit)="submit()">
