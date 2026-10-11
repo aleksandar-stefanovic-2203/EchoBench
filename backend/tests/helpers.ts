@@ -18,6 +18,6 @@ export async function fixture() {
   const id = result.body.survey.id as string;
   const published = await request(app).post(`/api/surveys/${id}/publish`).auth(token, { type: 'bearer' });
   const publicToken = published.body.survey.shareUrl.split('/').at(-1);
-  const response = { clientRequestId: randomUUID(), respondentEmail: ' Person@Example.com ', answers: body.questions.map(q => ({ questionId: q.id, value: q.type === 'text' ? q.required ? 'Mentori su odlični.' : '' : q.type === 'multiple_choice' ? q.options[0].id : q.required ? q.options.map(o => o.id) : [] })) };
+  const response = { clientRequestId: randomUUID(), respondentEmail: ' Person@Example.com ', durationMs: 35_000, answers: body.questions.map(q => ({ questionId: q.id, value: q.type === 'text' ? q.required ? 'Mentori su odlični.' : '' : q.type === 'multiple_choice' ? q.options[0].id : q.required ? q.options.map(o => o.id) : [] })) };
   return { app, token, body, id, publicToken, response };
 }

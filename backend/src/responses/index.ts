@@ -5,6 +5,11 @@ import { ApiError } from '../middleware/errors.js';
 import { Validator } from '../middleware/validation.js';
 import { ownedSurvey } from '../surveys/index.js';
 import type { Store } from '../store/index.js';
+const BASE_SUBMISSION_DURATION_MS = 10_000;
+const PER_QUESTION_DURATION_MS = 5_000;
+export function minimumSubmissionDurationMs(questionCount: number) {
+  return BASE_SUBMISSION_DURATION_MS + questionCount * PER_QUESTION_DURATION_MS;
+}
 import type { Answer, Survey } from '../types/index.js';
 function publicSurvey(store: Store, token: string) {
   const id = store.surveyIdByPublicToken.get(token); const survey = id ? store.surveysById.get(id) : undefined;
@@ -12,8 +17,9 @@ function publicSurvey(store: Store, token: string) {
   return survey;
 }
 export function submissionInput(input: unknown, survey: Survey) {
-  const v = new Validator(); const body = v.object(input, 'body', ['clientRequestId', 'respondentEmail', 'answers']);
+  const v = new Validator(); const body = v.object(input, 'body', ['clientRequestId', 'respondentEmail', 'answers', 'durationMs']);
   const clientRequestId = v.id(body.clientRequestId, 'clientRequestId'); const email = v.email(body.respondentEmail, 'respondentEmail');
+  const durationMs = typeof body.durationMs === 'number' && Number.isFinite(body.durationMs) && body.durationMs >= 0 ? body.durationMs : 0;
   const byId = new Map<string, unknown>(); const answers: Answer[] = [];
   if (!Array.isArray(body.answers)) v.fail('answers', 'Unesite odgovore na sva pitanja.');
   else body.answers.forEach(raw => {
@@ -36,7 +42,7 @@ export function submissionInput(input: unknown, survey: Survey) {
       answers.push({ questionId: q.id, value: typeof value === 'string' ? value : '' });
     }
   });
-  v.done(); return { clientRequestId, email, answers };
+  v.done(); return { clientRequestId, email, durationMs, answers };
 }
 export function publicRouter(store: Store) {
   const router = Router();
@@ -45,7 +51,12 @@ export function publicRouter(store: Store) {
     res.json({ survey: { title, description, questions, requiresEmail: true } });
   });
   router.post('/:publicToken/responses', (req, res) => {
-    const survey = publicSurvey(store, req.params.publicToken); const { clientRequestId, email, answers } = submissionInput(req.body, survey);
+    const survey = publicSurvey(store, req.params.publicToken); const { clientRequestId, email, durationMs, answers } = submissionInput(req.body, survey);
+    const minimumDurationMs = minimumSubmissionDurationMs(survey.questions.length);
+    if (durationMs < minimumDurationMs) {
+      res.status(202).json({ accepted: false, ignored: true, reason: `Popunjavanje ankete je trajalo kraće od ${minimumDurationMs / 1000} sekundi; odgovor je ignorisan.` });
+      return;
+    }
     const key = `${survey.id}:${clientRequestId}`; const list = store.submissionsBySurveyId.get(survey.id) ?? []; const existingId = store.submissionIdByRequestKey.get(key);
     if (existingId) {
       const existing = list.find(s => s.id === existingId)!;

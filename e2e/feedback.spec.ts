@@ -3,6 +3,7 @@ async function register(page:Page,suffix:string) {
   await page.goto('/register'); await page.getByLabel('Korisničko ime').fill(`org-${suffix}`); await page.getByLabel('Mejl',{exact:true}).fill(`${suffix}@example.com`); await page.getByLabel('Lozinka',{exact:true}).fill('demo123'); await page.getByLabel('Potvrdite lozinku').fill('demo123'); await page.getByRole('button',{name:'Registruj se'}).click(); await expect(page.getByRole('heading',{name:'Moje ankete'})).toBeVisible();
 }
 test('organizer → draft → public mobile form → three responses → owner/privacy/logout', async({page,browser})=>{
+  test.setTimeout(150000);
   const browserErrors:string[]=[];page.on('pageerror',e=>browserErrors.push(e.message));
   await register(page,crypto.randomUUID()); await expect(page.getByText('Prva anketa počinje ovde.')).toBeVisible();
   await page.getByRole('link',{name:'+ Nova anketa',exact:true}).click(); await page.getByLabel('Naslov ankete').fill('Feedback hakatona'); await page.getByLabel('Opis').fill('Podelite svoje utiske.');
@@ -16,13 +17,13 @@ test('organizer → draft → public mobile form → three responses → owner/p
   expect(await guest.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click(); await expect(guest.getByRole('heading',{name:'Hvala na utiscima!'})).not.toBeVisible();
   await guest.getByLabel('Vaš mejl').fill('guest@example.com'); await guest.getByLabel('1. Šta je bilo najbolje?').fill('Mentori su odlični.'); await guest.getByLabel('Mentori',{exact:true}).check(); await guest.getByLabel('Radionice',{exact:true}).check();
-  await guest.getByLabel('Vaš mejl').focus(); await guest.keyboard.press('Tab'); await expect(guest.getByLabel('1. Šta je bilo najbolje?')).toBeFocused();
+  await guest.getByLabel('Vaš mejl').focus(); await guest.keyboard.press('Tab'); await expect(guest.getByLabel('1. Šta je bilo najbolje?')).toBeFocused(); await guest.waitForTimeout(30000);
   // Simulate an ambiguous network failure AFTER the server commits: same retry key must return 200.
   const sent: unknown[]=[]; let first=true;
   await guest.route('**/api/public/surveys/*/responses',async route=>{sent.push(route.request().postDataJSON()); if(first){first=false; await route.fetch(); await route.abort('failed');}else await route.continue();});
   await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click(); await expect(guest.getByRole('alert')).toBeVisible(); await expect(guest.getByLabel('1. Šta je bilo najbolje?')).toHaveValue('Mentori su odlični.');
   await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click(); await expect(guest.getByRole('heading',{name:'Hvala na utiscima!'})).toBeVisible(); expect(sent[1]).toEqual(sent[0]); await guest.unrouteAll();
-  for(let i=0;i<2;i++){await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.getByLabel('Vaš mejl').fill('guest@example.com');await guest.getByLabel('1. Šta je bilo najbolje?').fill(`Odgovor ${i+2}`);await guest.getByLabel('Mentori',{exact:true}).check();await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click();await expect(guest.getByRole('heading',{name:'Hvala na utiscima!'})).toBeVisible();}
+  for(let i=0;i<2;i++){await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.getByLabel('Vaš mejl').fill('guest@example.com');await guest.getByLabel('1. Šta je bilo najbolje?').fill(`Odgovor ${i+2}`);await guest.getByLabel('Mentori',{exact:true}).check();await guest.waitForTimeout(30000);await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click();await expect(guest.getByRole('heading',{name:'Hvala na utiscima!'})).toBeVisible();}
   await page.getByRole('button',{name:'Osveži odgovore'}).click(); await expect(page.getByRole('heading',{name:'Odgovori · 3',exact:true})).toBeVisible(); await page.locator('summary').last().click(); await expect(page.getByText('Mentori, Radionice',{exact:true})).toBeVisible(); await expect(page.getByText('guest@example.com')).not.toBeVisible();
   let summaryCalls=0;
   await page.route('**/api/surveys/*/summary',async route=>{
@@ -35,7 +36,7 @@ test('organizer → draft → public mobile form → three responses → owner/p
   await page.getByRole('button',{name:'Sumiraj',exact:true}).click();await expect(page.getByRole('alert')).toContainText('Gemma API nije dostupan');
   await page.getByRole('button',{name:'Sumiraj',exact:true}).click();await expect(page.getByRole('button',{name:'Sažimanje…',exact:true})).toBeDisabled();
   await expect(page.getByRole('heading',{name:'AI sažetak',exact:true})).toBeVisible();await expect(page.getByText('Učesnici hvale mentore.',{exact:true})).toBeVisible();expect(summaryCalls).toBe(2);
-  await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.getByLabel('Vaš mejl').fill('guest@example.com');await guest.getByLabel('1. Šta je bilo najbolje?').fill('Novi utisak');await guest.getByLabel('Mentori',{exact:true}).check();await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click();
+  await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.getByLabel('Vaš mejl').fill('guest@example.com');await guest.getByLabel('1. Šta je bilo najbolje?').fill('Novi utisak');await guest.getByLabel('Mentori',{exact:true}).check();await guest.waitForTimeout(30000);await guest.getByRole('button',{name:'Pošalji feedback',exact:true}).click();
   await page.getByRole('button',{name:'Osveži odgovore'}).click();await expect(page.getByText('Stigli su novi odgovori. Kliknite „Sumiraj” za ažuriran sažetak.')).toBeVisible();
   await page.screenshot({path:'test-results/organizer-detail.png',fullPage:true});
   await guest.getByRole('button',{name:'Popuni ponovo'}).click();await guest.screenshot({path:'test-results/public-mobile.png',fullPage:true});
@@ -56,7 +57,7 @@ test('demo volume opens 10 surveys and 200 responses within two seconds',async({
   for(let i=0;i<10;i++) {
     const qid=crypto.randomUUID();const created=await page.request.post('/api/surveys',{headers,data:{title:`Demo ${i+1}`,description:'',questions:[{id:qid,type:'text',label:'Utisak',required:true}]}});expect(created.status()).toBe(201);id=(await created.json()).survey.id;
     const published=await page.request.post(`/api/surveys/${id}/publish`,{headers});const publicToken=(await published.json()).survey.shareUrl.split('/').at(-1);
-    for(let j=0;j<200;j+=20) {const submissions=await Promise.all(Array.from({length:20},(_,k)=>page.request.post(`/api/public/surveys/${publicToken}/responses`,{data:{clientRequestId:crypto.randomUUID(),respondentEmail:'demo@example.com',answers:[{questionId:qid,value:`Utisak ${j+k+1}`}]}})));expect(submissions.every(r=>r.status()===201)).toBe(true);}
+    for(let j=0;j<200;j+=20) {const submissions=await Promise.all(Array.from({length:20},(_,k)=>page.request.post(`/api/public/surveys/${publicToken}/responses`,{data:{clientRequestId:crypto.randomUUID(),respondentEmail:'demo@example.com',durationMs:30_000,answers:[{questionId:qid,value:`Utisak ${j+k+1}`}]}})));expect(submissions.every(r=>r.status()===201)).toBe(true);}
   }
   let start=Date.now();await page.goto('/surveys');await expect(page.locator('.survey-grid .card')).toHaveCount(10);const listMs=Date.now()-start;
   start=Date.now();await page.goto(`/surveys/${id}`);await expect(page.locator('details')).toHaveCount(200);const detailMs=Date.now()-start;

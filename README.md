@@ -56,6 +56,7 @@ E2E koristi instalirani Microsoft Edge i automatski pokreće oba servera kada ni
 - Tekstualna, checkbox (više izbora) i multiple choice (jedan izbor) pitanja, obavezna ili opciona. Nacrt se može menjati; objavljena anketa je zaključana i ima stabilan javni link.
 - Mejl učesnika je obavezan, čuva se odvojeno i ne vraća u organizatorski pregled. Nema verifikacije mejla niti tvrdnje o potpunoj anonimnosti.
 - Isti mejl može ponovo da popuni anketu. Retry istog zahteva ne pravi dodatnu predaju; isti ključ sa drugim sadržajem daje konflikt.
+- Predaje poslate pre minimalnog vremena odbacuju se i ne čuvaju. Minimalno vreme je 10 sekundi plus 5 sekundi po pitanju (na primer, anketa sa 5 pitanja zahteva 35 sekundi); korisnik ipak dobija potvrdu da je feedback predat.
 - Lozinke se po dogovorenom planu čuvaju kao obični stringovi u memoriji. Ovo je lokalni demo prototip.
 
 Specifikacija i ugovor: [plan-hakaton](plan-hakaton/README.md). Napredak: [tasks.md](plan-hakaton/tasks.md). Rezultati provera: [verification.md](plan-hakaton/verification.md).

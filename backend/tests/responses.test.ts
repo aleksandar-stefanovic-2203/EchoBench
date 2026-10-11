@@ -10,6 +10,14 @@ describe('US3/US4 responses', () => {
     expect(result.status).toBe(200); expect(Object.keys(result.body.survey).sort()).toEqual(['description', 'questions', 'requiresEmail', 'title']);
     expect((await request(app).get('/api/public/surveys/invalid')).status).toBe(404);
   });
+  it('prima, ali ne čuva predaju koja je završena pre minimalnog vremena', async () => {
+    const { app, publicToken, token, id, response } = await fixture();
+    const result = await request(app).post(`/api/public/surveys/${publicToken}/responses`).send({ ...response, durationMs: 34_999 });
+    expect(result.status).toBe(202);
+    expect(result.body).toMatchObject({ accepted: false, ignored: true });
+    expect(result.body.reason).toContain('35 sekundi');
+    expect((await request(app).get(`/api/surveys/${id}/responses`).auth(token, { type: 'bearer' })).body).toEqual({ items: [], total: 0 });
+  });
   it('atomarna validacija odbija prazne, nedostajuće, duple/nepoznate i pogrešne odgovore', async () => {
     const { app, publicToken, token, id, response } = await fixture();
     const invalid = [ { ...response, respondentEmail: 'wrong' }, { ...response, clientRequestId: 'wrong' }, { ...response, answers: response.answers.slice(1) }, { ...response, answers: [...response.answers,response.answers[0]] }, { ...response, answers: response.answers.map((a,i) => i === 0 ? { ...a, questionId: randomUUID() } : a) }, { ...response, answers: response.answers.map((a,i) => i === 0 ? { ...a, value: ' ' } : a) }, { ...response, answers: response.answers.map((a,i) => i === 0 ? { ...a, value: 'x'.repeat(2001) } : a) }, { ...response, answers: response.answers.map((a,i) => i === 1 ? { ...a, value: [randomUUID()] } : a) }, { ...response, answers: response.answers.map((a,i) => i === 1 ? { ...a, value: [] } : a) }, { ...response, answers: response.answers.map((a,i) => i === 1 ? { ...a, value: [a.value[0],a.value[0]] } : a) }, { ...response, answers: response.answers.map((a,i) => i === 0 ? { ...a, value: [] } : a) }, { ...response, answers: response.answers.map((a,i) => i === 1 ? { ...a, value: 'text' } : a) }, { ...response, ownerId: 'fake' } ];
