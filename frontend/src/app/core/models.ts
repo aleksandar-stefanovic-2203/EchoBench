@@ -18,5 +18,5 @@ export interface SurveySummary {
 export interface PublicSurvey { title: string; description: string; questions: Question[]; requiresEmail: true }
 export interface Failure { message: string; fields: Record<string, string> }
 export function failure(error: any): Failure {
-  return { message: error?.error?.error?.message ?? 'Server nije dostupan. Pokušajte ponovo; vaš unos je sačuvan u ovoj formi.', fields: error?.error?.error?.fields ?? {} };
+  return { message: error?.error?.error?.message ?? 'The server is unavailable. Try again; your input is preserved in this form.', fields: error?.error?.error?.fields ?? {} };
 }

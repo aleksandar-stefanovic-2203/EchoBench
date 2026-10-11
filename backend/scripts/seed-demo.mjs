@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 const base = process.env.DEMO_API_URL ?? 'http://localhost:3000/api';
-const credentials = { username: 'seminar-demo', email: 'demo@gemmify.test', password: 'Seminar123!' };
+const credentials = { username: 'seminar-demo', email: 'demo@eventbench.test', password: 'Seminar123!' };
 async function api(path, data, token) {
   const response = await fetch(base + path, { method: data === undefined ? 'GET' : 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, ...(data === undefined ? {} : { body: JSON.stringify(data) }) });
   const body = await response.json();
@@ -13,23 +13,23 @@ catch { auth = await api('/auth/register', credentials); }
 const token = auth.sessionToken;
 const existing = (await api('/surveys', undefined, token)).items;
 const datasets = [
-  { title: 'Demo · AI seminar — hladna sala', positive: ['Predavači su stručni i primeri veoma korisni.', 'Sadržaj je relevantan, ali smo imali malo praktičnih vežbi.', 'Odličan predavač; želeo bih više diskusije.', 'Konkretni primeri su primenljivi na poslu.', 'Dobro objašnjene teme, radionica je bila korisna.', 'Stručno izlaganje, ali nedovoljno vremena za pitanja.'], negative: ['Temperatura u sali je bila niska, smrzavali smo se. Početak je kasnio i pauza je bila kratka.', 'Sala je hladna i raspored nije bio jasno objavljen.', 'Klima je prejaka, bilo mi je hladno tokom celog seminara. Nije bilo dovoljno osveženja.', 'Organizacija je loša: predavanja kasne i pauze su prekratke.', 'Hladna sala i slab zvuk. Prijava je ipak bila jednostavna.', 'Niska temperatura otežala mi je praćenje. Potrebna je duža pauza.'], choices: [1, 1, 0, 0, 2, 1], issues: [[0, 1], [0, 2], [0, 1], [1, 2], [0, 3], [0, 1]] },
-  { title: 'Demo · Web seminar — dobra organizacija', positive: ['Organizacija je odlična, sve je počelo na vreme. Predavači su jasni.', 'Kvalitetan sadržaj i dovoljno praktičnih vežbi.', 'Predavači su stručni i odgovarali su na sva pitanja.', 'Odlična diskusija i rad u grupama.', 'Korisni primeri i dobro pripremljen raspored.', 'Program je relevantan, imali smo dovoljno vremena za vežbu.'], negative: ['Sala je prijatna i temperatura odgovarajuća. Pauze i osveženje su odlični.', 'Pauze su bile dovoljne. Internet je povremeno prekidao.', 'Prostor je udoban, logistika dobro organizovana.', 'Sadržaj je mogao biti malo napredniji.', 'Sve je na vreme, ali je zvuk pozadi bio slab.', 'Nemam žalbe, prijatna sala i dobar raspored.'], choices: [4, 4, 3, 4, 3, 4], issues: [[], [3], [], [], [3], []] },
-  { title: 'Demo · Data seminar — premalo prakse', positive: ['Predavači su stručni, sadržaj detaljan.', 'Relevantne teme i jasno izlaganje.', 'Prijava i satnica su dobro organizovani.', 'Sala je topla i oprema je radila odlično.', 'Predavač je pripremljen, primeri korisni.', 'Dobro organizovan program i prijatan prostor.'], negative: ['Previše teorije i premalo praktičnog rada. Pauze su bile dobre.', 'Nedostaju vežbe i diskusija, prezentacija je preduga.', 'Malo vremena za pitanja, želeo bih više interakcije.', 'Sadržaj je previše osnovan za iskusnije učesnike.', 'Potrebno je više radionica. Osveženje je bilo dobro.', 'Praktični primeri nisu dovoljno razrađeni. Pauze su odgovarajuće.'], choices: [3, 2, 3, 2, 3, 2], issues: [[2], [2], [2], [], [2], [2]] },
+  { title: 'Demo · AI seminar — cold room', positive: ['The speakers are knowledgeable and the examples are very useful.', 'The content is relevant, but we had few practical exercises.', 'Excellent speaker; I would like more discussion.', 'The concrete examples can be applied at work.', 'The topics were explained well and the workshop was useful.', 'Knowledgeable presentation, but not enough time for questions.'], negative: ['The room temperature was low and we were freezing. The start was delayed and the break was short.', 'The room was cold and the schedule was not clearly posted.', 'The air conditioning was too strong and I was cold throughout the seminar. There were not enough refreshments.', 'Organization was poor: talks started late and breaks were too short.', 'Cold room and poor sound. Registration was easy, though.', 'The low temperature made it hard to concentrate. A longer break is needed.'], choices: [1, 1, 0, 0, 2, 1], issues: [[0, 1], [0, 2], [0, 1], [1, 2], [0, 3], [0, 1]] },
+  { title: 'Demo · Web seminar — well organized', positive: ['Organization was excellent and everything started on time. The speakers were clear.', 'High-quality content and enough practical exercises.', 'The speakers were knowledgeable and answered all questions.', 'Excellent discussion and group work.', 'Useful examples and a well-prepared schedule.', 'The program was relevant and we had enough time to practice.'], negative: ['The room was pleasant and the temperature was comfortable. Breaks and refreshments were excellent.', 'Breaks were sufficient. The internet occasionally disconnected.', 'The venue was comfortable and logistics were well organized.', 'The content could have been a little more advanced.', 'Everything was on time, but the sound was weak at the back.', 'No complaints, a pleasant room and a good schedule.'], choices: [4, 4, 3, 4, 3, 4], issues: [[], [3], [], [], [3], []] },
+  { title: 'Demo · Data seminar — not enough practice', positive: ['The speakers were knowledgeable and the content was detailed.', 'Relevant topics and clear presentations.', 'Registration and the schedule were well organized.', 'The room was warm and the equipment worked perfectly.', 'The speaker was prepared and the examples were useful.', 'A well-organized program and a pleasant venue.'], negative: ['Too much theory and not enough hands-on work. Breaks were good.', 'More exercises and discussion are needed; the presentation was too long.', 'Little time for questions; I would like more interaction.', 'The content was too basic for experienced attendees.', 'More workshops are needed. Refreshments were good.', 'The practical examples need more detail. Breaks were adequate.'], choices: [3, 2, 3, 2, 3, 2], issues: [[2], [2], [2], [], [2], [2]] },
 ];
 const events = [];
 for (const data of datasets) {
   const found = existing.find(s => s.title === data.title);
   if (found?.responseCount) { events.push({ id: found.id, title: found.title }); continue; }
-  const rating = ['1 — Veoma loša', '2 — Loša', '3 — Osrednja', '4 — Dobra', '5 — Odlična'].map(label => ({ id: randomUUID(), label }));
-  const problems = ['Niska temperatura', 'Kratke pauze', 'Premalo praktičnog rada', 'Zvuk ili internet'].map(label => ({ id: randomUUID(), label }));
+  const rating = ['1 — Very poor', '2 — Poor', '3 — Average', '4 — Good', '5 — Excellent'].map(label => ({ id: randomUUID(), label }));
+  const problems = ['Low temperature', 'Short breaks', 'Not enough hands-on work', 'Sound or internet'].map(label => ({ id: randomUUID(), label }));
   const questions = [
-    { id: randomUUID(), type: 'text', label: 'Šta je bilo dobro?', required: true },
-    { id: randomUUID(), type: 'text', label: 'Šta treba poboljšati?', required: true },
-    { id: randomUUID(), type: 'multiple_choice', label: 'Kako ocenjujete organizaciju?', required: true, options: rating },
-    { id: randomUUID(), type: 'checkbox', label: 'Koje probleme ste primetili?', required: false, options: problems },
+    { id: randomUUID(), type: 'text', label: 'What went well?', required: true },
+    { id: randomUUID(), type: 'text', label: 'What should be improved?', required: true },
+    { id: randomUUID(), type: 'multiple_choice', label: 'How would you rate the organization?', required: true, options: rating },
+    { id: randomUUID(), type: 'checkbox', label: 'Which issues did you notice?', required: false, options: problems },
   ];
-  const survey = (await api('/surveys', { title: data.title, description: 'Sintetički feedback za ručno testiranje poređenja, analitike i izvora AI nalaza.', questions }, token)).survey;
+  const survey = (await api('/surveys', { title: data.title, description: 'Synthetic feedback for manually testing comparisons, analytics, and AI finding sources.', questions }, token)).survey;
   const published = (await api('/surveys/' + survey.id + '/publish', {}, token)).survey;
   const publicToken = published.shareUrl.split('/').at(-1);
   for (let i = 0; i < data.positive.length; i++) {

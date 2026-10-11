@@ -17,7 +17,7 @@ export function createApp(store: Store = createStore(), publicAppUrl = process.e
   app.use('/api/surveys', responsesRouter(store));
   app.use('/api/surveys', summariesRouter(store, summaryProvider));
   app.use('/api/surveys', surveysRouter(store, publicAppUrl));
-  app.use((_req, _res, next) => next(new ApiError(404, 'NOT_FOUND', 'Traženi sadržaj nije dostupan.')));
+  app.use((_req, _res, next) => next(new ApiError(404, 'NOT_FOUND', 'The requested content is unavailable.')));
   app.use(errorHandler);
   return app;
 }

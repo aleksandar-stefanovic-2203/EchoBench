@@ -5,18 +5,18 @@ export class Validator {
   fields: Record<string, string> = {};
   fail(key: string, message: string) { this.fields[key] = message; }
   object(value: unknown, path: string, allowed: string[]): Record<string, unknown> {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) { this.fail(path, 'Očekivan je objekat.'); return {}; }
+    if (!value || typeof value !== 'object' || Array.isArray(value)) { this.fail(path, 'Expected an object.'); return {}; }
     const obj = value as Record<string, unknown>;
-    if (Object.keys(obj).some(key => !allowed.includes(key))) this.fail(path, 'Zahtev sadrži nedozvoljena polja.');
+    if (Object.keys(obj).some(key => !allowed.includes(key))) this.fail(path, 'The request contains unsupported fields.');
     return obj;
   }
   string(value: unknown, key: string, min: number, max: number, trim = true): string {
-    if (typeof value !== 'string') { this.fail(key, 'Unesite tekst.'); return ''; }
+    if (typeof value !== 'string') { this.fail(key, 'Enter text.'); return ''; }
     const result = trim ? value.trim() : value;
-    if (result.length < min || result.length > max) this.fail(key, `Unesite od ${min} do ${max} znakova.`);
+    if (result.length < min || result.length > max) this.fail(key, `Enter between ${min} and ${max} characters.`);
     return result;
   }
-  id(value: unknown, key: string): string { if (typeof value !== 'string' || !uuid.test(value)) this.fail(key, 'Identifikator mora biti UUID.'); return typeof value === 'string' ? value : ''; }
-  email(value: unknown, key: string) { const email = this.string(value, key, 1, 254).toLowerCase(); if (!isEmail(email)) this.fail(key, 'Unesite ispravnu mejl adresu.'); return email; }
-  done() { if (Object.keys(this.fields).length) throw new ApiError(422, 'VALIDATION_ERROR', 'Proverite označena polja.', this.fields); }
+  id(value: unknown, key: string): string { if (typeof value !== 'string' || !uuid.test(value)) this.fail(key, 'The identifier must be a UUID.'); return typeof value === 'string' ? value : ''; }
+  email(value: unknown, key: string) { const email = this.string(value, key, 1, 254).toLowerCase(); if (!isEmail(email)) this.fail(key, 'Enter a valid email address.'); return email; }
+  done() { if (Object.keys(this.fields).length) throw new ApiError(422, 'VALIDATION_ERROR', 'Check the highlighted fields.', this.fields); }
 }

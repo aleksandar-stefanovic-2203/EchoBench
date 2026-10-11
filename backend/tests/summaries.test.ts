@@ -7,7 +7,7 @@ import { register, surveyBody } from './helpers.js';
 import { GemmaProvider, type SummaryInput } from '../src/summaries/index.js';
 import { ApiError } from '../src/middleware/errors.js';
 
-const result = { overview: 'Mentori su pohvaljeni.', themes: [{text: 'Mentorstvo', sourceIds: ['S1']}], positiveHighlights: [{text: 'Dostupni mentori', sourceIds: ['S1']}], improvements: [], suggestedActions: [{text: 'Zadržati mentorstvo', sourceIds: ['S1']}], assessments: [] };
+const result = { overview: 'Attendees praise the mentors.', themes: [{text: 'Mentoring', sourceIds: ['S1']}], positiveHighlights: [{text: 'Helpful mentors', sourceIds: ['S1']}], improvements: [], suggestedActions: [{text: 'Keep the mentoring program', sourceIds: ['S1']}], assessments: [] };
 async function setup() {
   const summarize = vi.fn(async (_input: SummaryInput) => result);
   const app = createApp(createStore(), 'http://localhost:4200', { model: 'gemma-test', summarize });
@@ -47,7 +47,7 @@ describe('summary ownership and snapshot', () => {
     expect(r.status).toBe(200); expect(r.body.summary).toMatchObject({ overview: result.overview, themes: result.themes, surveyId: f.id, responseCount: 3, model: 'gemma-test' });
     const input = f.summarize.mock.calls[0][0];
     expect(input.surveys[0].responseCount).toBe(3); expect(input.sources).toHaveLength(3 * f.body.questions.length);
-    expect(JSON.stringify(input)).toContain('Mentori');
+    expect(JSON.stringify(input)).toContain('Mentors');
     for (const forbidden of ['private@example.com', 'respondentEmail', 'clientRequestId', 'password', 'sessionToken', 'ownerId']) expect(JSON.stringify(input)).not.toContain(forbidden);
     expect((await request(f.app).post(`/api/surveys/${f.id}/summary`).auth(f.token, { type: 'bearer' }).send({ responses: [] })).status).toBe(422);
   });
@@ -63,7 +63,7 @@ describe('summary ownership and snapshot', () => {
     finish(result);
     expect((await job).body.summary.responseCount).toBe(1);
     expect(f.summarize.mock.calls[0][0].surveys[0].responseCount).toBe(1);
-    f.summarize.mockRejectedValueOnce(new ApiError(503, 'SUMMARY_UNAVAILABLE', 'Gemma API nije dostupan.'));
+    f.summarize.mockRejectedValueOnce(new ApiError(503, 'SUMMARY_UNAVAILABLE', 'The Gemma API is unavailable.'));
     expect((await request(f.app).post(path).auth(f.token, { type: 'bearer' })).status).toBe(503);
     expect((await request(f.app).post(path).auth(f.token, { type: 'bearer' })).body.summary.responseCount).toBe(2);
   });
@@ -77,7 +77,7 @@ describe('summary ownership and snapshot', () => {
   });
 });
 describe('Gemma REST provider', () => {
-  const input: SummaryInput = { surveyId: 'event', title: 'Demo', description: '', surveys: [{id: 'event', title: 'Demo', responseCount: 1}], sources: [{sourceId: 'S1', surveyId: 'event', surveyTitle: 'Demo', submissionId: 'r1', questionId: 'q1', responseNumber: 1, questionNumber: 1, question: 'Utisak?', value: 'Odlično'}] };
+  const input: SummaryInput = { surveyId: 'event', title: 'Demo', description: '', surveys: [{id: 'event', title: 'Demo', responseCount: 1}], sources: [{sourceId: 'S1', surveyId: 'event', surveyTitle: 'Demo', submissionId: 'r1', questionId: 'q1', responseNumber: 1, questionNumber: 1, question: 'Feedback?', value: 'Odlično'}] };
   const reply = (text = JSON.stringify(result)) => new Response(JSON.stringify({ candidates: [{ finishReason: 'STOP', content: { parts: [{ text }] } }] }), { status: 200 });
   it('uses the configured Gemma model and keeps key out of URL', async () => {
     const fetcher = vi.fn(async () => reply('```json\n' + JSON.stringify(result) + '\n```'));
@@ -86,6 +86,9 @@ describe('Gemma REST provider', () => {
     const [url, options] = fetcher.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toContain('gemma-4-26b-a4b-it:generateContent'); expect(url).not.toContain('secret');
     expect(options.headers).toMatchObject({ 'x-goog-api-key': 'secret' });
+    const prompt = JSON.parse(options.body as string).contents[0].parts[0].text;
+    expect(prompt).toContain('write all summaries, findings, and suggested actions in English, regardless of the language of the input');
+    expect(prompt).toContain('Odlično');
   });
   it('includes all large-input fragments and merges batch summaries', async () => {
     const prompts: string[] = [];
@@ -100,9 +103,9 @@ describe('Gemma REST provider', () => {
     const sources=Array.from({length:30},(_,i)=>({...input.sources[0],sourceId:`S${i+1}`,submissionId:`r${i+1}`,value:'Hladna sala. '+ 'a'.repeat(1980)}));
     const provider=new GemmaProvider({apiKey:'secret',fetcher:async(_url,options)=>{
       const prompt=JSON.parse(options!.body as string).contents[0].parts[0].text;
-      const data=JSON.parse(prompt.split('\nPODACI:\n')[1]);
+      const data=JSON.parse(prompt.split('\nDATA:\n')[1]);
       const ids:string[]=data.answers ? data.answers.map((a:any)=>a.sourceId) : data.partialSummaries.flatMap((p:any)=>p.improvements.flatMap((f:any)=>f.sourceIds));
-      return reply(JSON.stringify({overview:'Hladna sala.',themes:[],positiveHighlights:[],improvements:[{text:'Temperatura je niska',sourceIds:ids}],suggestedActions:[],assessments:data.answers ? ids.map(sourceId=>({sourceId,criterionId:'venue',sentiment:'negative'})) : []}));
+      return reply(JSON.stringify({overview:'Hladna sala.',themes:[],positiveHighlights:[],improvements:[{text:'The temperature was low',sourceIds:ids}],suggestedActions:[],assessments:data.answers ? ids.map(sourceId=>({sourceId,criterionId:'venue',sentiment:'negative'})) : []}));
     }});
     const summarized=await provider.summarize({...input,sources});
     expect(summarized.improvements[0].sourceIds).toHaveLength(30);expect(summarized.assessments).toHaveLength(30);
@@ -112,12 +115,49 @@ describe('Gemma REST provider', () => {
     const extended:SummaryInput={...input,surveys:[...input.surveys,{id:'other',title:'Other seminar',responseCount:1}],sources:[...input.sources,{...input.sources[0],sourceId:'S2',surveyId:'other',submissionId:'r2',value:'Prijatna sala'}]};
     const provider=new GemmaProvider({apiKey:'secret',fetcher:async(_url,options)=>{
       const prompt=JSON.parse(options!.body as string).contents[0].parts[0].text;
-      const data=JSON.parse(prompt.split('\nPODACI:\n')[1]);calls.push(data.title);
+      const data=JSON.parse(prompt.split('\nDATA:\n')[1]);calls.push(data.title);
       const sourceId=data.answers[0].sourceId;
       return reply(JSON.stringify({overview:'Pregled',themes:[{text:'Uslovi',sourceIds:[sourceId]}],positiveHighlights:[],improvements:[],suggestedActions:[],assessments:[{sourceId,criterionId:'venue',sentiment:'positive'}]}));
     }});
     const content=await provider.summarize(extended);
     expect(calls).toEqual(['Demo','Other seminar']);expect(content.themes[0].sourceIds).toEqual(['S1']);expect(content.assessments.map(a=>a.sourceId)).toEqual(['S1','S2']);
+  });
+  it('runs independent events concurrently with a limit and retains snapshot order', async () => {
+    const surveys = Array.from({length: 5}, (_, i) => ({id: i ? `other-${i}` : input.surveyId, title: `Event ${i}`, responseCount: 1}));
+    const sources = surveys.map((event, i) => ({...input.sources[0], sourceId: `S${i + 1}`, surveyId: event.id}));
+    const releases = new Map<string, () => void>();
+    let active = 0; let peak = 0;
+    const fetcher = vi.fn(async (_url: string | URL | Request, options?: RequestInit) => {
+      const prompt = JSON.parse(options!.body as string).contents[0].parts[0].text;
+      const data = JSON.parse(prompt.split('\nDATA:\n')[1]);
+      active++; peak = Math.max(peak, active);
+      await new Promise<void>(resolve => releases.set(data.title, resolve));
+      active--;
+      return reply(JSON.stringify({...result, assessments: [{sourceId: data.answers[0].sourceId, criterionId: 'venue', sentiment: 'positive'}]}));
+    });
+    const pending = new GemmaProvider({apiKey: 'secret', fetcher}).summarize({...input, surveys, sources});
+    await vi.waitFor(() => expect(releases.size).toBe(3));
+    expect(fetcher).toHaveBeenCalledTimes(3);
+    releases.get('Event 2')!();
+    await vi.waitFor(() => expect(releases.has('Event 3')).toBe(true));
+    releases.get('Event 1')!();
+    await vi.waitFor(() => expect(releases.has('Event 4')).toBe(true));
+    releases.get('Event 4')!(); releases.get('Event 3')!(); releases.get('Event 0')!();
+    const content = await pending;
+    expect(peak).toBe(3);
+    expect(content.assessments.map(a => a.sourceId)).toEqual(['S1','S2','S3','S4','S5']);
+    expect(content.themes).toEqual(result.themes);
+  });
+  it('cancels active comparisons and does not start queued requests after a timeout', async () => {
+    const surveys = Array.from({length: 5}, (_, i) => ({id: i ? `other-${i}` : input.surveyId, title: `Event ${i}`, responseCount: 1}));
+    const sources = surveys.map((event, i) => ({...input.sources[0], sourceId: `S${i + 1}`, surveyId: event.id}));
+    let aborted = 0;
+    const fetcher = vi.fn(async (_url: string | URL | Request, options?: RequestInit) => new Promise<Response>((_resolve, reject) => {
+      options!.signal!.addEventListener('abort', () => { aborted++; reject(new Error('aborted')); }, {once: true});
+    }));
+    await expect(new GemmaProvider({apiKey: 'secret', timeoutMs: 20, fetcher}).summarize({...input, surveys, sources})).rejects.toMatchObject({status: 504, code: 'SUMMARY_TIMEOUT'});
+    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(aborted).toBe(3);
   });
   it('reports missing configuration, upstream failure, invalid output and timeout safely', async () => {
     await expect(new GemmaProvider({ apiKey: '' }).summarize(input)).rejects.toMatchObject({ status: 503 });
