@@ -49,6 +49,14 @@ node backend/scripts/seed-demo.mjs
 
 Log in at http://localhost:4200 with **demo@eventbench.test** / **Seminar123!**. The script creates three demo seminars with six synthetic submissions each. Open **Demo · AI seminar — cold room**, click **Summarize**, then click the temperature finding. Source responses appear below the finding, followed by comparisons and percentages. Restarting clears memory; rerun the demo script to restore the data. `node backend/scripts/check-demo-summary.mjs` optionally makes a real summary API request.
 
+For a larger local dataset, run this from the project root while the backend is running:
+
+```powershell
+node backend/scripts/seed-load-demo.mjs
+```
+
+This creates 10 demo accounts (`load-demo-01@echobench.test` through `load-demo-10@echobench.test`, all with password `Demo123!`), at least 20 published surveys, and 20 synthetic responses per survey. `load-demo-01` owns 10 surveys; each of the other nine users owns two, for 28 surveys total. The script can be rerun without duplicating completed responses. All data is held in memory and is cleared when the backend restarts.
+
 ## Verification
 
 From the project root:
