@@ -1,0 +1,16 @@
+node_modules/
+.npm-cache/
+dist/
+build/
+coverage/
+.angular/
+playwright-report/
+test-results/
+.env*
+!.env.example
+*.log
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp

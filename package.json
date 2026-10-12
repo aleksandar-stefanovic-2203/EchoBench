@@ -1,0 +1,13 @@
+{
+  "name": "eventbench",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test": "npm --prefix backend test",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}
