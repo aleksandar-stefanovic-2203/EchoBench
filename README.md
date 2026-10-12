@@ -1,22 +1,28 @@
 # EchoBench
 
-Event feedback: organizers create surveys, share links, and review responses; attendees respond without an account. The entire application is in English, including validation messages, demo content, and AI-generated summaries. See [AGENTS.md](AGENTS.md) for the naming and language conventions.
+EchoBench helps event organizers review large volumes of attendee feedback without having to read every response one by one. With a single click, organizers can summarize feedback across their surveys into one concise overview, see what went well and what could be improved with supporting attendee comments, and compare their event with their other events.
 
-Angular 21 frontend + Express 5/TypeScript backend. Data lives in the RAM of a single server. Restarting clears accounts, sessions, surveys, contacts, and submissions. **Summarize** calls Gemma through the Gemini API and processes all submissions for the selected survey. A Kaggle notebook and usefulness evaluation remain future hackathon work.
+Organizers create and publish surveys and share a public link; attendees can submit feedback without creating an account.
 
-## Getting started
+The application has an Angular frontend and an Express/TypeScript API. Survey data is held in server memory, so restarting the backend clears accounts, sessions, surveys, and submissions. This is a local demo prototype, not a production service.
 
-Node 24 LTS is recommended; Node 22.12+ is also supported. You need npm and two terminals.
+## Requirements
+
+- Node.js 22.12 or later (Node.js 24 LTS recommended)
+- npm
+
+## Run locally
+
+Install dependencies and start the backend:
 
 ```powershell
 cd backend
 npm ci
 Copy-Item .env.example .env
-# Set GEMINI_API_KEY in .env before starting if you want AI summaries.
 npm run dev
 ```
 
-In another terminal, from the project root:
+In a second terminal, install frontend dependencies and start the frontend:
 
 ```powershell
 cd frontend
@@ -24,42 +30,54 @@ npm ci
 npm start
 ```
 
-Open **http://localhost:4200**. API health: http://localhost:3000/api/health. The Angular proxy forwards `/api` requests to the backend on port 3000.
+Open [http://localhost:4200](http://localhost:4200). The backend health endpoint is [http://localhost:3000/api/health](http://localhost:3000/api/health). The Angular development server proxies `/api` requests to the backend.
 
-The backend automatically loads `backend/.env`; existing environment variables take precedence. `PORT` and `PUBLIC_APP_URL` default to 3000 and `http://localhost:4200`. To access the app from another device, set a reachable LAN address before starting the backend:
+The API reads configuration from `backend/.env`; environment variables already set in the process take precedence. `PORT` defaults to `3000`, and `PUBLIC_APP_URL` defaults to `http://localhost:4200`.
 
-```powershell
-$env:PUBLIC_APP_URL = 'http://192.168.1.10:4200'
-npm run dev
+### AI summaries
+
+AI summaries use Gemma through the Gemini API. Add a Google AI Studio key to `GEMINI_API_KEY` in `backend/.env`, then restart the backend. Without a key, the rest of the application works, but the summary action reports a configuration error.
+
+Optional settings:
+
+```dotenv
+GEMMA_MODEL=gemma-4-26b-a4b-it
+SUMMARY_TIMEOUT_MS=120000
 ```
 
-For AI, set a Google AI Studio key in `GEMINI_API_KEY`. The key stays in the ignored `backend/.env` and is never sent to the browser. `GEMMA_MODEL=gemma-4-26b-a4b-it` selects the Gemma model, and `SUMMARY_TIMEOUT_MS=120000` sets the overall summarization timeout. Restart the backend after changing configuration. Google documents Gemma access through the [Gemini API](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api).
+Keep API keys and other credentials private. Review `backend/.env` before staging or committing files.
 
-Summaries use a snapshot of survey responses, resolve checkbox IDs into option labels, and exclude contact emails and login data. Larger inputs are processed in batches and their findings merged. Independent analysis batches run concurrently, with at most three requests at a time sharing the overall timeout; failed jobs cancel their outstanding requests. Repeated identical classifications are counted once; conflicting classifications still fail validation. The interface shows the number of processed submissions, generation time, and model; refreshing responses marks an outdated summary. Without a key, the rest of the application works and **Summarize** displays a configuration error. Summaries remain in the current view and are not saved to disk. Free-text questions and responses can contain personal information entered by their authors; separately collected contact details are excluded from the AI payload. AI narrative output is requested in English regardless of input language; quoted source responses retain their original text.
+## Features
 
-## Comparisons and manual demo
+- Organizer registration, login, logout, and 24-hour sessions.
+- Draft surveys with text, checkbox, and multiple-choice questions.
+- Published surveys with shareable public links; published surveys are locked from editing.
+- Attendee submissions without an account. An email address is collected separately from responses and is not shown in the organizer's response view.
+- Response summaries with cited source responses, comparisons across the organizer's surveys, and choice analytics.
 
-Summaries compare the selected event with the organizer's other surveys across six criteria, show exact choice analytics, and let you click findings to inspect their source responses. Criterion scores are AI assessments; choice percentages are calculated directly by the backend. Other organizers' events are excluded.
+Summaries are generated from a snapshot of responses and are not saved. Contact emails and login data are excluded from the AI payload. Free-text answers may contain personal information entered by respondents.
 
-With the backend running:
+## Demo data
+
+Start the backend first, then run a seeding script from the project root:
 
 ```powershell
 node backend/scripts/seed-demo.mjs
 ```
 
-Log in at http://localhost:4200 with **demo@eventbench.test** / **Seminar123!**. The script creates three demo seminars with six synthetic submissions each. Open **Demo · AI seminar — cold room**, click **Summarize**, then click the temperature finding. Source responses appear below the finding, followed by comparisons and percentages. Restarting clears memory; rerun the demo script to restore the data. `node backend/scripts/check-demo-summary.mjs` optionally makes a real summary API request.
+This creates three demo seminars with synthetic submissions. Sign in using `demo@eventbench.test` / `Seminar123!` to explore the organizer experience.
 
-For a larger local dataset, run this from the project root while the backend is running:
+For a larger synthetic dataset:
 
 ```powershell
 node backend/scripts/seed-load-demo.mjs
 ```
 
-This creates 10 demo accounts (`load-demo-01@echobench.test` through `load-demo-10@echobench.test`, all with password `Demo123!`), at least 20 published surveys, and 20 synthetic responses per survey. `load-demo-01` owns 10 surveys; each of the other nine users owns two, for 28 surveys total. The script can be rerun without duplicating completed responses. All data is held in memory and is cleared when the backend restarts.
+Demo data is held in memory and is cleared when the backend restarts. The load-demo script creates accounts with the password `Demo123!`.
 
-## Verification
+## Tests and build
 
-From the project root:
+Run commands from the project root:
 
 ```powershell
 npm ci
@@ -68,14 +86,12 @@ npm run build
 npm run test:e2e
 ```
 
-E2E tests use installed Microsoft Edge and start both servers automatically when they are not already running. They use no real accounts or emails. Backend tests use an isolated RAM store; browser tests create demo data on the local server.
+The root package provides the end-to-end Playwright test script. Backend tests use an isolated in-memory store. Browser tests use Microsoft Edge and the local application.
 
-## Prototype behavior
+## Project structure
 
-- Registration, login, logout, and 24-hour sessions. Only the session token is stored in `sessionStorage`.
-- Text, checkbox (multiple selections), and multiple choice (single selection) questions can be required or optional. Drafts can be edited; published surveys are locked and have a stable public link.
-- Attendee emails are required, stored separately, and excluded from the organizer view. Emails are not verified, and complete anonymity is not claimed.
-- The same email can submit again. Retrying an identical request does not create another submission; reusing the request key with different content returns a conflict.
-- Passwords are stored as plain strings in memory, as specified in the original plan. This is a local demo prototype.
-
-Original specification and API contract: [plan-hakaton](plan-hakaton/README.md). Progress: [tasks.md](plan-hakaton/tasks.md). Earlier verification results: [verification.md](plan-hakaton/verification.md). These historical documents describe the original prototype; the current EchoBench name and English language requirement supersede their older branding and language choices.
+- `backend/` — Express API, in-memory data store, tests, and demo scripts.
+- `frontend/` — Angular application.
+- `e2e/` — Playwright end-to-end tests.
+- `plan-hackathon/` — project planning and historical hackathon documentation.
+- `theme-images/` — source images for the hackathon theme documentation.

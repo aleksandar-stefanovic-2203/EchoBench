@@ -43,7 +43,7 @@ Implementacija prati sledeće predložene odluke, na osnovu korisnikovog naloga 
 
 ## Veza sa temom hakatona
 
-Slike iz `tema-slike` zahtevaju **Gemmu kao ključnu komponentu** i **Kaggle kao deo razvoja**. Koncept odgovara oblasti „Feedback & Continuous Improvement”. Gemma integracija je implementirana u nastavku; stvarna provera sa ključem, procena korisnosti i dokaz rada u Kaggle-u još su potrebni za završni demo. Detalji su u [research.md](research.md).
+Slike iz `theme-images` zahtevaju **Gemmu kao ključnu komponentu** i **Kaggle kao deo razvoja**. Koncept odgovara oblasti „Feedback & Continuous Improvement”. Gemma integracija je implementirana u nastavku; stvarna provera sa ključem, procena korisnosti i dokaz rada u Kaggle-u još su potrebni za završni demo. Detalji su u [research.md](research.md).
 
 ## Dokumenti
 

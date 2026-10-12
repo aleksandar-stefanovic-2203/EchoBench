@@ -8,11 +8,11 @@ Pročitano je svih pet dostavljenih slika:
 
 | Izvor | Zaključak za projekat |
 | --- | --- |
-| [The Challenge](../tema-slike/Screenshot%202026-10-10%20163213.png) | AI rešenje uz Gemmu treba da unapredi iskustvo učesnika, organizatora ili oba |
-| [Possible Areas to Explore](../tema-slike/Screenshot%202026-10-10%20163244.png) | „Feedback & Continuous Improvement” direktno odgovara ideji |
-| [Requirements](../tema-slike/Screenshot%202026-10-10%20163250.png) | Gemma je ključna komponenta; Kaggle je obavezan deo razvoja; potreban je funkcionalan prototip i pokazivanje korisnog/merljivog poboljšanja |
-| [Your Mission](../tema-slike/Screenshot%202026-10-10%20163255.png) | Cilj je lakša organizacija i bolje iskustvo događaja |
-| [Objava izazova](../tema-slike/Screenshot%202026-10-10%20163329.png) | Potvrđuje fokus na iskustvo događaja uz Gemmu |
+| [The Challenge](../theme-images/Screenshot%202026-10-10%20163213.png) | AI rešenje uz Gemmu treba da unapredi iskustvo učesnika, organizatora ili oba |
+| [Possible Areas to Explore](../theme-images/Screenshot%202026-10-10%20163244.png) | „Feedback & Continuous Improvement” direktno odgovara ideji |
+| [Requirements](../theme-images/Screenshot%202026-10-10%20163250.png) | Gemma je ključna komponenta; Kaggle je obavezan deo razvoja; potreban je funkcionalan prototip i pokazivanje korisnog/merljivog poboljšanja |
+| [Your Mission](../theme-images/Screenshot%202026-10-10%20163255.png) | Cilj je lakša organizacija i bolje iskustvo događaja |
+| [Objava izazova](../theme-images/Screenshot%202026-10-10%20163329.png) | Potvrđuje fokus na iskustvo događaja uz Gemmu |
 
 **Odluka:** prvo gradimo dogovoreni prototip anketa, zatim AI fazu. Prva faza sama još ne pokriva sve navedene zahteve hakatona.
 
